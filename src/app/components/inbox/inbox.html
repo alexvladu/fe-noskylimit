@@ -1,0 +1,117 @@
+<div class="inbox-wrapper">
+  <!-- Sidebar -->
+  <div class="inbox-sidebar">
+    <div class="sidebar-header">
+      <h1>Messages</h1>
+      <button class="compose-btn">
+        <span class="plus-icon">+</span>
+        Compose
+      </button>
+    </div>
+
+    <div class="inbox-stats">
+      <div class="stat-card">
+        <span class="stat-number">{{ messages.length }}</span>
+        <span class="stat-label">Total</span>
+      </div>
+      <div class="stat-card unread">
+        <span class="stat-number">{{ getUnreadCount() }}</span>
+        <span class="stat-label">Unread</span>
+      </div>
+    </div>
+
+    <div class="message-list">
+      <div 
+        *ngFor="let message of messages" 
+        class="message-card"
+        [class.unread]="!message.read"
+        [class.active]="selectedMessage?.id === message.id"
+        (click)="selectMessage(message)">
+        
+        <div class="message-avatar">
+          <span>{{ getInitials(message.nume) }}</span>
+        </div>
+        
+        <div class="message-info">
+          <div class="message-top">
+            <span class="sender-name">{{ message.nume }}</span>
+            <span class="message-time">{{ getTimeAgo(message.timestamp) }}</span>
+          </div>
+          <div class="message-subject">{{ message.maj }}</div>
+          <div class="message-preview">Click to view full message...</div>
+        </div>
+
+        <div class="message-actions">
+          <button 
+            class="action-btn delete"
+            (click)="deleteMessage(message, $event)"
+            title="Delete">
+            🗑️
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="messages.length === 0" class="empty-inbox">
+        <div class="empty-icon">📭</div>
+        <h3>No messages yet</h3>
+        <p>Your inbox is empty</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Detail View -->
+  <div class="message-viewer">
+    <div *ngIf="selectedMessage" class="viewer-content">
+      <div class="viewer-header">
+        <div class="header-left">
+          <div class="sender-avatar-large">
+            <span>{{ getInitials(selectedMessage.nume) }}</span>
+          </div>
+          <div class="sender-info">
+            <h2>{{ selectedMessage.maj }}</h2>
+            <p class="sender-details">
+              <span class="sender-name-large">{{ selectedMessage.nume }}</span>
+              <span class="bullet">•</span>
+              <span class="timestamp">{{ selectedMessage.timestamp | date:'EEEE, MMMM d, y \'at\' h:mm a' }}</span>
+            </p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" title="Reply">
+            <span>↩️</span>
+          </button>
+          <button class="icon-btn" title="Forward">
+            <span>➡️</span>
+          </button>
+          <button class="icon-btn" title="Archive">
+            <span>📦</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="viewer-body">
+        <div class="message-content">
+          <p>Dear User,</p>
+          <p>This is the content of your message regarding: <strong>{{ selectedMessage.maj }}</strong></p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+          <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          <br>
+          <p>Best regards,<br>{{ selectedMessage.nume }}</p>
+        </div>
+
+        <div class="reply-section">
+          <button class="reply-btn">
+            <span>💬</span>
+            Reply to this message
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!selectedMessage" class="no-message-selected">
+      <div class="placeholder-icon">✉️</div>
+      <h3>Select a message</h3>
+      <p>Choose a message from the list to view its contents</p>
+    </div>
+  </div>
+</div>

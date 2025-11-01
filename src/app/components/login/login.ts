@@ -1,24 +1,50 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, NgZone, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../services/auth/auth.service';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Subject, takeUntil, finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.html',
-  styleUrls: ['./login.scss'],
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [FormsModule]
+  imports: [FormsModule, CommonModule, RouterModule]
 })
-export class LoginComponent {
-  email: string = '';
-  password: string = '';
+export class LoginComponent{
+  email = '';
+  password = '';
+  isLoading = false;
+  error = '';
+
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   onSubmit() {
+    this.error = '';
+    this.isLoading = true;
+
     if (!this.email || !this.password) {
-      alert('Te rog completează toate câmpurile!');
+      this.error = 'Completează ambele câmpuri.';
       return;
     }
-    console.log('Email:', this.email);
-    console.log('Parola:', this.password);
-    alert('Login efectuat cu succes!');
+
+    this.authService.login({
+      email: this.email,
+      password: this.password
+    })
+    .subscribe({
+      next: (response:LoginResponse) => {
+        this.authService.saveToken(response.token);
+        this.router.navigate(['/']);
+      },
+      error: (err:any) => {
+        this.error="Access denied";
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
   }
 }

@@ -1,6 +1,12 @@
 <div class="login-container">
   <div class="login-card">
     <h2>Login</h2>
+
+    <!-- Mesaj de eroare -->
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+
     <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
       <div class="form-group">
         <label for="email">Email</label>
@@ -10,7 +16,10 @@
           name="email"
           [(ngModel)]="email"
           required
+          email
           placeholder="Introdu emailul"
+          [disabled]="isLoading"
+          autocomplete="email"
         />
       </div>
 
@@ -22,11 +31,24 @@
           name="password"
           [(ngModel)]="password"
           required
+          minlength="6"
           placeholder="Introdu parola"
+          [disabled]="isLoading"
+          autocomplete="current-password"
         />
       </div>
 
-      <button type="submit">Login</button>
+      <button 
+        type="submit" 
+        [disabled]="isLoading || !email || !password"
+        [class.loading]="isLoading">
+        <span *ngIf="!isLoading">Login</span>
+        <span *ngIf="isLoading">Se conectează...</span>
+      </button>
     </form>
+
+    <div class="extra-links">
+      <a routerLink="/register">Creează cont nou</a>
+    </div>
   </div>
 </div>

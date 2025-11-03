@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { environment } from '../../../enviroment';
 import { LoginDto } from '../../interfaces/login-dto';
 
@@ -9,6 +9,10 @@ import { LoginDto } from '../../interfaces/login-dto';
 })
 export class AuthService {
 
+  register(user: { name: string; email: string; password: string }): Observable<any> {
+    // Replace with actual HTTP request logic
+    return of({ success: true });
+  }
   private apiUrl = environment.baseUrl;
   private http = inject(HttpClient);
 

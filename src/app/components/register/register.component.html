@@ -1,16 +1,18 @@
 <div class="auth-card">
   <img src="/Users/georgedregan/fe-noskylimit/src/assets/logo.png" alt="App Logo" class="logo" />
-  <h2>Welcome Back</h2>
+  <h2>Create Account</h2>
 
-  <form (ngSubmit)="onLogin()">
+  <form (ngSubmit)="onRegister()">
+    <input type="text" name="name" [(ngModel)]="name" placeholder="Full Name" required />
     <input type="email" name="email" [(ngModel)]="email" placeholder="Email" required />
     <input type="password" name="password" [(ngModel)]="password" placeholder="Password" required />
-    <button type="submit" [disabled]="isLoading">{{ isLoading ? 'Loading...' : 'Log In' }}</button>
+
+    <button type="submit" [disabled]="isLoading">{{ isLoading ? 'Creating...' : 'Register' }}</button>
   </form>
 
   <p>
-    Don’t have an account?
-    <a routerLink="/register">Register</a>
+    Already have an account?
+    <a routerLink="/login">Log In</a>
   </p>
 
   <p *ngIf="error" style="color:red;">{{ error }}</p>

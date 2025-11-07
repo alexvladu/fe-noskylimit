@@ -18,6 +18,11 @@ export const routes: Routes = [
     canActivate: [GuestGuard]
   },
   {
+    path: 'inbox',
+    component: InboxComponent,
+    // canActivate: [SomeGuard]
+  },
+  {
     path: '',
     component: MainLayoutComponent,
     children: [

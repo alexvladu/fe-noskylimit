@@ -1,23 +1,25 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component } from '@angular/core';
 
-import { Register } from './register';
+@Component({
+  selector: 'app-register',
+  templateUrl: './register.component.html',
+})
+export class RegisterComponent {
+  name = '';
+  email = '';
+  password = '';
 
-describe('Register', () => {
-  let component: Register;
-  let fixture: ComponentFixture<Register>;
+  onRegister() {
+    console.log('Registering user:', {
+      name: this.name,
+      email: this.email,
+      password: this.password,
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [Register]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(Register);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    // TODO: Add your registration logic here.
+    // Typically, you would:
+    // 1. Send this data to an API via an AuthService.
+    // 2. Handle success (redirect, token storage, etc.).
+    // 3. Handle errors (show error message).
+  }
+}

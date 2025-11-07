@@ -4,6 +4,7 @@ import { RegisterComponent } from './components/register/register';
 import { AuthGuard } from './guards/auth.guard';
 import { GuestGuard } from './guards/guest.guard';
 import { HomeComponent } from './components/home/home';
+import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 
 export const routes: Routes = [
   { 
@@ -16,10 +17,21 @@ export const routes: Routes = [
     component: RegisterComponent,
     canActivate: [GuestGuard]
   },
-  { 
-    path: '', 
-    component: HomeComponent,
-    canActivate: [AuthGuard],
+  {
+    path: '',
+    component: MainLayoutComponent,
+    children: [
+      {
+        path: 'home',
+        component: HomeComponent,
+        // canActivate: [AuthGuard]
+      },
+      {
+        path: '',
+        redirectTo: 'home',
+        pathMatch: 'full'
+      }
+    ]
   },
   { 
     path: '**', 

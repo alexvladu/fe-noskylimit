@@ -1,0 +1,12 @@
+<nav>
+  <ul>
+    <li class="logo"><a routerLink="/home"><img src="/Logo.png" alt="Home"></a></li>
+    <li><a routerLink="/inbox"><fa-icon [icon]="faEnvelope"></fa-icon> <span>Inbox</span></a></li>
+    <li><a routerLink="/likes"><fa-icon [icon]="faHeart"></fa-icon> <span>Likes</span></a></li>
+  </ul>
+  <div class="bottom-nav">
+    <a routerLink="/settings"><fa-icon [icon]="faCog"></fa-icon> <span>Settings</span></a>
+    <hr class="separator">
+    <a routerLink="/profile"><fa-icon [icon]="faUserCircle"></fa-icon> <span>Profile</span></a>
+  </div>
+</nav>

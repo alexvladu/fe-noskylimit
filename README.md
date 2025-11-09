@@ -2,6 +2,9 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.6.
 
+
+First you need to have npm installed locally, then you need to install all packages with npm install from root folder.
+
 ## Development server
 
 To start a local development server, run:

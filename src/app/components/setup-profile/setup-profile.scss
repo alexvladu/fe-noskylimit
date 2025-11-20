@@ -1,0 +1,248 @@
+// Importuri sau definiri de variabile (la fel ca in register)
+$gradient-start: #ff6a00;
+$gradient-end: #ee0979;
+$text-color: #333;
+$border-color: #ddd;
+
+// --- FIX MAJOR: CENTRARE PE ECRAN ---
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, $gradient-start, $gradient-end); // Acelasi background ca la login
+  font-family: 'Poppins', sans-serif;
+  padding: 20px; // Ca sa nu fie lipit de margini pe mobil
+  box-sizing: border-box;
+}
+
+.auth-card {
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  width: 100%;
+  max-width: 500px; // Putin mai lat decat login-ul pentru ca avem poze/tags
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+  position: relative;
+  overflow: hidden; // Previne scroll-ul nedorit in card
+}
+// --------------------------------------
+
+.progress-container {
+  width: 100%;
+  height: 6px;
+  background: #f0f0f0;
+  border-radius: 3px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(to right, $gradient-start, $gradient-end);
+    transition: width 0.3s ease;
+  }
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: $text-color;
+  font-weight: 600;
+}
+
+// Animatie intrare pas
+.step-content {
+  animation: slideIn 0.4s ease;
+  text-align: left;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+// Layout Inputuri
+.row {
+  display: flex;
+  gap: 1rem;
+  input { flex: 1; }
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid $border-color;
+  font-size: 1rem;
+  outline: none;
+  margin-bottom: 1rem;
+  background: #fff;
+  box-sizing: border-box;
+  font-family: inherit;
+
+  &:focus {
+    border-color: $gradient-end;
+    box-shadow: 0 0 0 3px rgba(238, 9, 121, 0.1);
+  }
+}
+
+// Fix pentru multi-select ca sa nu fie prea inalt implicit
+.multi-select {
+  height: auto;
+  min-height: 100px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: $text-color;
+  font-size: 0.9rem;
+}
+
+small {
+  display: block;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+  color: #999;
+  font-size: 0.75rem;
+}
+
+// --- HOBBIES (Pasul 3) ---
+.hobbies-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+
+  h2 { margin: 0; }
+
+  .counter {
+    font-size: 0.85rem;
+    background: #f0f0f0;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: #666;
+
+    &.full {
+      background: rgba(238, 9, 121, 0.1);
+      color: $gradient-end;
+    }
+  }
+}
+
+.subtext {
+  color: #888;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.hobbies-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.hobby-chip {
+  border: 1px solid $border-color;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+
+  &:hover { background: #f9f9f9; border-color: #ccc; }
+
+  &.selected {
+    background: linear-gradient(135deg, $gradient-start, $gradient-end);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 10px rgba(238, 9, 121, 0.2);
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.input-group textarea {
+  resize: none;
+}
+
+// --- PHOTOS (Pasul 2) ---
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.photo-card {
+  aspect-ratio: 1;
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #eee;
+}
+
+.upload-btn {
+  aspect-ratio: 1;
+  border: 2px dashed $gradient-end;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  span { font-size: 2rem; color: $gradient-end; }
+  &:hover { background: rgba(238, 9, 121, 0.05); }
+}
+
+.hint {
+  text-align: center;
+  color: #888;
+  font-size: 0.85rem;
+}
+
+// --- BUTTONS ---
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+
+  button {
+    flex: 1;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+    font-size: 1rem;
+
+    &.primary-btn {
+      background: linear-gradient(to right, $gradient-start, $gradient-end);
+      color: white;
+      box-shadow: 0 5px 15px rgba(238, 9, 121, 0.3);
+
+      &:hover { transform: translateY(-2px); }
+    }
+
+    &.secondary-btn {
+      background: #f0f0f0;
+      color: $text-color;
+      &:hover { background: #e0e0e0; }
+    }
+  }
+}

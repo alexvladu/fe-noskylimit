@@ -5,22 +5,24 @@ import { HomeComponent } from './components/home/home';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 import { GuestGuard } from './guards/guest.guard';
 import { RegisterComponent } from './components/register/register';
+import { SetupProfile } from './components/setup-profile/setup-profile';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { 
-    path: 'login', 
+  {
+    path: 'login',
     component: LoginComponent,
     canActivate: [GuestGuard]
   },
-  { 
-    path: 'register', 
+  {
+    path: 'register',
     component: RegisterComponent,
     canActivate: [GuestGuard]
   },
   {
-    path: 'inbox',
-    component: InboxComponent,
-    // canActivate: [SomeGuard]
+    path: 'setup-profile',
+    component: SetupProfile,
+    canActivate: [GuestGuard]
   },
   {
     path: '',
@@ -29,7 +31,12 @@ export const routes: Routes = [
       {
         path: 'home',
         component: HomeComponent,
-        // canActivate: [AuthGuard]
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'inbox',
+        component: InboxComponent,
+        // canActivate: [SomeGuard]
       },
       {
         path: '',
@@ -38,8 +45,8 @@ export const routes: Routes = [
       }
     ]
   },
-  { 
-    path: '**', 
+  {
+    path: '**',
     redirectTo: '/login'
   }
 ];

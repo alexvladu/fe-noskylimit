@@ -1,0 +1,121 @@
+@use "sass:color";
+$font-family: 'Poppins', sans-serif;
+$gradient-start: #ff6a00;
+$gradient-end: #ee0979;
+$text-color: #333;
+$input-border: #ddd;
+$focus-ring: rgba(238, 9, 121, 0.4);
+
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: calc(100vw - 100px);
+  margin-left: 100px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #ff5500, #ff1f53);
+}
+
+.card-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.card-stack {
+  position: relative;
+  width: 500px;
+  height: 900px;
+  
+  /* OPTION 1: Compact (350x650) - Shorter, good for mobile-first */
+  /* width: 350px; */
+  /* height: 650px; */
+  
+  /* OPTION 2: Balanced (380x680) - Current, nice proportion */
+  /* width: 380px; */
+  /* height: 680px; */
+  
+  /* OPTION 3: Tall (400x720) - More vertical, Instagram-story style */
+  /* width: 400px; */
+  /* height: 720px; */
+  
+  /* OPTION 4: Extra Tall (380x750) - Very portrait, modern dating apps */
+  /* width: 380px; */
+  /* height: 750px; */
+}
+
+.card {
+  width: 500px;
+  height: 900px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: absolute;
+
+  border: 5px solid #383838f5;
+  box-shadow: 0 20px 50px rgba(255, 0, 127, 0.35);
+
+  background: #ffffff;
+  transform: translate(-50%, -50%) scale(1.02);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.card.active {
+  z-index: 10;
+}
+
+.card.swipeleft {
+  animation: swipeLeft 0.5s ease-out forwards;
+}
+
+.card.swiperight {
+  animation: swipeRight 0.5s ease-out forwards;
+}
+
+@keyframes swipeLeft {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-150%) rotate(-30deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipeRight {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(150%) rotate(30deg);
+    opacity: 0;
+  }
+}
+
+.card img {
+  width: 100%;
+  height: 75%;
+  object-fit: cover;
+}
+
+.card-info {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card-info h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}

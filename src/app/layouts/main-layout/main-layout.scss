@@ -1,8 +1,14 @@
 .main-container {
     display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background: transparent; /* remove white overlay */
 }
 
 .content {
     flex-grow: 1;
-    padding: 100px;
+    margin-left: 0;      /* no offset here; Tinder page will set its own */
+    padding: 0;
+    overflow: hidden;
 }

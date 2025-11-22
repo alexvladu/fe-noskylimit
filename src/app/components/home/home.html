@@ -1,1 +1,24 @@
-<p>home works!</p>
+<div class="card-container">
+  <div class="card-stack">
+    <div
+      *ngFor="let card of cards; let i = index"
+      class="card"
+      [ngClass]="{
+        'active': i === cards.length - 1,
+        'swipeleft': i === cards.length - 1 && animationState === 'swipeleft',
+        'swiperight': i === cards.length - 1 && animationState === 'swiperight'
+      }"
+      [style.zIndex]="i"
+      [style.transform]="
+        'scale(' + (1 - (cards.length - 1 - i) * 0.05) + ')' +
+        ' translateY(' + ((cards.length - 1 - i) * -10) + 'px)'
+      "
+    >
+      <img [src]="card.img" [alt]="card.name" />
+
+      <div class="card-info">
+        <h3>{{ card.name }}</h3>
+      </div>
+    </div>
+  </div>
+</div>

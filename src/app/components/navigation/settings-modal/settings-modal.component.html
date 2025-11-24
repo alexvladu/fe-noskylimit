@@ -4,8 +4,8 @@
     
     <div class="modal-header">
       <h2>Account Settings</h2>
-      <button class="close-btn" (click)="close.emit()">
-        <fa-icon [icon]="faTimes"></fa-icon>
+      <button class="close-btn" (click)="close.emit()" aria-label="Close settings">
+        ✕
       </button>
     </div>
 
@@ -13,14 +13,14 @@
 
       <!-- Change Password Section -->
       <div class="setting-item" (click)="openChangePassword()">
-        <fa-icon [icon]="faKey" class="icon"></fa-icon>
+        <span class="icon" aria-hidden="true">🔑</span>
         <span>Change Password</span>
         <span class="chevron">></span>
       </div>
 
       <!-- Logout -->
       <div class="setting-item logout" (click)="logout.emit()">
-        <fa-icon [icon]="faSignOutAlt" class="icon text-red"></fa-icon>
+        <span class="icon text-red" aria-hidden="true">↩</span>
         <span class="text-red">Log out</span>
       </div>
 

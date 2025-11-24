@@ -2,23 +2,17 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faTimes, faKey, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-settings-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './settings-modal.component.html',
   styleUrl: './settings-modal.component.scss'
 })
 export class SettingsModalComponent {
   @Output() close = new EventEmitter<void>();
   @Output() logout = new EventEmitter<void>();
-
-  faTimes = faTimes;
-  faKey = faKey;
-  faSignOutAlt = faSignOutAlt;
 
   showPasswordForm = false;
   currentPassword = '';

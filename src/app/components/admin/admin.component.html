@@ -1,0 +1,123 @@
+<section class="admin-page">
+  <header class="admin-header">
+    <div>
+      <p class="eyebrow">Safety console</p>
+      <h1>Reports dashboard</h1>
+      <p class="subhead">
+        Track who has filed reports and follow up before things escalate.
+      </p>
+    </div>
+    <button class="refresh-btn" type="button" (click)="loadData()" [disabled]="isLoading">
+      {{ isLoading ? 'Refreshing…' : 'Refresh data' }}
+    </button>
+  </header>
+
+  <section class="summary-grid" *ngIf="summary">
+    <article>
+      <span>Total users</span>
+      <strong>{{ summary.totalUsers }}</strong>
+    </article>
+    <article>
+      <span>Active reporters</span>
+      <strong>{{ summary.reporters }}</strong>
+    </article>
+    <article>
+      <span>Open reports</span>
+      <strong>{{ summary.openReports }}</strong>
+    </article>
+  </section>
+
+  <section class="controls">
+    <div class="search">
+      <input
+        type="search"
+        placeholder="Search by name or email"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+
+    <div class="filter">
+      <button type="button" [class.active]="filter === 'all'" (click)="setFilter('all')">
+        All users
+      </button>
+      <button type="button" [class.active]="filter === 'reporters'" (click)="setFilter('reporters')">
+        Reporters only
+      </button>
+    </div>
+  </section>
+
+  <section class="admin-content">
+    <div class="users-card">
+      <h2>Users</h2>
+
+      <ng-container *ngIf="!isLoading; else loadingState">
+        <div *ngIf="filteredUsers.length; else emptyState" class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th class="text-center">Reports filed</th>
+                <th class="text-center">Open</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let user of filteredUsers"
+                (click)="selectUser(user)"
+                [class.selected]="user.id === selectedUser?.id"
+              >
+                <td>
+                  <div class="user-name">
+                    <strong>{{ user.name }}</strong>
+                    <span>Last active {{ user.lastActive | date: 'short' }}</span>
+                  </div>
+                </td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role | titlecase }}</td>
+                <td class="text-center">{{ getTotalReports(user) }}</td>
+                <td class="text-center">{{ getOpenReports(user) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="reports-card">
+      <h2>Reports</h2>
+
+      <ng-container *ngIf="selectedUser; else noSelection">
+        <div *ngIf="getTotalReports(selectedUser) > 0; else noReports" class="reports-list">
+          <article *ngFor="let report of selectedUser?.reports">
+            <header>
+              <strong>#{{ report.id }} · {{ report.status | titlecase }}</strong>
+              <span>{{ report.createdAt | date: 'medium' }}</span>
+            </header>
+            <p>Target: <b>{{ report.targetName }}</b></p>
+            <p class="reason">{{ report.reason }}</p>
+          </article>
+        </div>
+      </ng-container>
+    </div>
+  </section>
+</section>
+
+<ng-template #loadingState>
+  <div class="placeholder">Loading latest data…</div>
+</ng-template>
+
+<ng-template #emptyState>
+  <div class="placeholder">No users match your filters.</div>
+</ng-template>
+
+<ng-template #noSelection>
+  <div class="placeholder">Select a user to inspect their reports.</div>
+</ng-template>
+
+<ng-template #noReports>
+  <div class="placeholder">This user has not reported anyone yet.</div>
+</ng-template>
+

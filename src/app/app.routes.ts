@@ -5,6 +5,7 @@ import { HomeComponent } from './components/home/home';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 import { GuestGuard } from './guards/guest.guard';
 import { RegisterComponent } from './components/register/register';
+import { AdminComponent } from './components/admin/admin';
 
 export const routes: Routes = [
   { 
@@ -29,6 +30,11 @@ export const routes: Routes = [
       {
         path: 'home',
         component: HomeComponent,
+        // canActivate: [AuthGuard]
+      },
+      {
+        path: 'admin',
+        component: AdminComponent,
         // canActivate: [AuthGuard]
       },
       {

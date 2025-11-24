@@ -1,0 +1,71 @@
+<!-- src/app/navigation/settings-modal/settings-modal.component.html -->
+<div class="modal-overlay" (click)="close.emit()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h2>Account Settings</h2>
+      <button class="close-btn" (click)="close.emit()">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
+    </div>
+
+    <div class="settings-body">
+
+      <!-- Change Password Section -->
+      <div class="setting-item" (click)="openChangePassword()">
+        <fa-icon [icon]="faKey" class="icon"></fa-icon>
+        <span>Change Password</span>
+        <span class="chevron">></span>
+      </div>
+
+      <!-- Logout -->
+      <div class="setting-item logout" (click)="logout.emit()">
+        <fa-icon [icon]="faSignOutAlt" class="icon text-red"></fa-icon>
+        <span class="text-red">Log out</span>
+      </div>
+
+      <!-- Change Password Form (inline modal) -->
+      <div class="password-form" *ngIf="showPasswordForm">
+        <div class="form-header">
+          <h3>Change Password</h3>
+          <button class="close-form" (click)="cancelChangePassword()">✕</button>
+        </div>
+
+        <form (ngSubmit)="submitChangePassword()">
+          <input 
+            type="password" 
+            placeholder="Current password" 
+            [(ngModel)]="currentPassword"
+            name="currentPassword"
+            required>
+
+          <input 
+            type="password" 
+            placeholder="New password" 
+            [(ngModel)]="newPassword"
+            name="newPassword"
+            required>
+
+          <input 
+            type="password" 
+            placeholder="Confirm new password" 
+            [(ngModel)]="confirmPassword"
+            name="confirmPassword"
+            required>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="cancelChangePassword()">
+              Cancel
+            </button>
+            <button type="submit" class="btn-save">
+              Save Changes
+            </button>
+          </div>
+
+          <div class="message error" *ngIf="error">{{ error }}</div>
+          <div class="message success" *ngIf="success">{{ success }}</div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

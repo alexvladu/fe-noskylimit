@@ -1,0 +1,117 @@
+<div class="auth-card">
+  <div class="progress-container">
+    <div class="progress-fill" [style.width.%]="(step / totalSteps) * 100"></div>
+  </div>
+
+  <form>
+    @if (step === 1) {
+      <div class="step-content fade-in">
+        <h2>The Basics</h2>
+
+        <div class="row">
+          <input type="number" placeholder="Age" [(ngModel)]="profile.age" name="age" min="18" max="70">
+          <input type="number" placeholder="Height (cm)" [(ngModel)]="profile.height" name="height" min="140" max="230">
+        </div>
+
+        <select [(ngModel)]="profile.gender" name="gender">
+          <option value="" disabled selected>Select Gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="non-binary">Non-binary</option>
+        </select>
+
+        <input type="text" placeholder="City / Location" [(ngModel)]="profile.location" name="location">
+
+        <label>Languages Spoken</label>
+        <select multiple [(ngModel)]="profile.languages" name="languages" class="multi-select">
+          @for (lang of availableLanguages; track lang) {
+            <option [value]="lang">{{ lang }}</option>
+          }
+        </select>
+        <small>Hold Ctrl/Cmd to select multiple</small>
+      </div>
+    }
+
+    @if (step === 2) {
+      <div class="step-content fade-in">
+        <h2>Your Photos</h2>
+        <div class="photo-grid">
+          @for (pic of profile.photoPreviews; track pic) {
+            <div class="photo-card" [style.backgroundImage]="'url(' + pic + ')'"></div>
+          }
+
+          <label class="upload-btn">
+            <span>+</span>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
+          </label>
+        </div>
+        <p class="hint">Add at least 2 photos to get noticed.</p>
+      </div>
+    }
+
+    @if (step === 3) {
+      <div class="step-content fade-in">
+        <div class="hobbies-header">
+          <h2>Passions & Interests</h2>
+          <span class="counter" [class.full]="profile.hobbies.length === 5">
+            {{ profile.hobbies.length }}/5
+          </span>
+        </div>
+        <p class="subtext">Pick the things you love most</p>
+
+        <div class="hobbies-pool">
+          @for (hobby of availableHobbies; track hobby) {
+            <button
+              type="button"
+              class="hobby-chip"
+              [class.selected]="isHobbySelected(hobby)"
+              [class.disabled]="!isHobbySelected(hobby) && profile.hobbies.length >= 5"
+              (click)="toggleHobby(hobby)">
+              {{ hobby }}
+              @if (isHobbySelected(hobby)) { <span class="check-icon">✓</span> }
+            </button>
+          }
+        </div>
+
+        <div class="input-group">
+          <label>About You</label>
+          <textarea [(ngModel)]="profile.bio" name="bio" placeholder="Describe yourself..." rows="4"></textarea>
+        </div>
+      </div>
+    }
+
+    @if (step === 4) {
+      <div class="step-content fade-in">
+        <h2>Preferences</h2>
+
+        <label>I am looking for...</label>
+        <select [(ngModel)]="profile.relationshipType" name="relType">
+          <option value="serious">Serious Relationship</option>
+          <option value="casual">Casual Dating</option>
+          <option value="friendship">Friendship</option>
+        </select>
+
+        <label>My Orientation</label>
+        <select [(ngModel)]="profile.sexualOrientation" name="orientation">
+          <option value="straight">Straight</option>
+          <option value="gay">Gay</option>
+          <option value="bisexual">Bisexual</option>
+        </select>
+
+        <label>Age Range: {{profile.ageRangeMin}} - {{profile.ageRangeMax}}</label>
+        <div class="range-inputs">
+          <input type="number" [(ngModel)]="profile.ageRangeMin" name="minAge" min="18">
+          <span>to</span>
+          <input type="number" [(ngModel)]="profile.ageRangeMax" name="maxAge" max="99">
+        </div>
+      </div>
+    }
+
+    <div class="actions">
+      <button type="button" *ngIf="step > 1" (click)="prevStep()" class="secondary-btn">Back</button>
+      <button type="button" (click)="nextStep()" class="primary-btn">
+        {{ step === totalSteps ? 'Finish' : 'Next' }}
+      </button>
+    </div>
+  </form>
+</div>

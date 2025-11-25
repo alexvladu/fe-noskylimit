@@ -33,7 +33,18 @@ export class RegisterComponent {
 
     this.authService.register({ name: this.name, email: this.email, password: this.password }).subscribe({
       next: () => {
-        this.router.navigate(['/login']);
+        this.authService.login({ email: this.email, password: this.password }).subscribe({
+          next: (response: any) => {
+            if (response && response.token) {
+              this.authService.saveToken(response.token);
+            }
+            this.router.navigate(['/setup-profile']);
+          },
+          error: (err) => {
+            console.error('Auto-login failed', err);
+            this.router.navigate(['/login']);
+          }
+        });
       },
       error: () => {
         this.error = 'Registration failed';

@@ -1,4 +1,14 @@
 <div class="card-container">
+<!-- LEFT BUTTON -->
+  <button class="swipe-btn left" (click)="swipe('left')">
+    ❌
+  </button>
+
+  <!-- RIGHT BUTTON -->
+<button class="swipe-btn right" (click)="swipe('right')">
+  <img src="/heart.png" alt="Like" class="heart-icon">
+</button>
+
   <div class="card-stack">
     <div
       *ngFor="let card of cards; let i = index"

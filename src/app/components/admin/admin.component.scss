@@ -1,10 +1,11 @@
 .admin-page {
   padding: 2rem;
+  margin-left: 100px; /* Account for fixed navigation */
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   background: #f7f8fb;
-  min-height: 100%;
+  min-height: 100vh;
 }
 
 .admin-header {

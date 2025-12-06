@@ -119,3 +119,60 @@ $focus-ring: rgba(238, 9, 121, 0.4);
   font-size: 24px;
   font-weight: 600;
 }
+
+.swipe-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+
+  background: rgba(20, 20, 20, 0.45);
+  backdrop-filter: blur(6px);
+
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.45),
+    0 0 10px rgba(0, 0, 0, 0.35);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 32px;
+  color: #ffffffd9;
+  cursor: pointer;
+
+  transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-50%) scale(1.10);
+    background: rgba(30, 30, 30, 0.65);
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.55),
+      0 0 15px rgba(255, 255, 255, 0.2);
+  }
+
+  &:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+}
+
+.swipe-btn.left {
+  left: 12%;
+}
+
+.swipe-btn.right {
+  right: 12%; // Add positioning for right button
+}
+
+// Add this new class for the heart image
+.heart-icon {
+  width: 40px;  // Adjust this to your preferred size (try 35px, 40px, or 45px)
+  height: 40px;
+  object-fit: contain;
+  display: block;
+}

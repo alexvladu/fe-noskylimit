@@ -1,6 +1,7 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { InboxService } from '../../services/inbox/inbox.service';
 
 export interface User {
   id: number;
@@ -36,14 +37,61 @@ export class InboxComponent implements OnInit, AfterViewChecked {
   @ViewChild('messagesEnd') messagesEnd!: ElementRef;
 
   readonly CURRENT_USER_ID = 1;
+  readonly OTHER_USER_ID = 2;
   contacts: Contact[] = [];
   selectedContact: Contact | null = null;
   messages: Message[] = [];
   newMessage = '';
   private shouldScroll = false;
+  isLoading = false;
+
+  constructor(private inboxService: InboxService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
+    // Load single mock contact (Dorel)
     this.loadContacts();
+    
+  }
+
+  loadMessagesFromBackend(): void {
+    this.isLoading = true;
+    this.messages = []; // Clear messages while loading
+    this.cdr.markForCheck();
+    
+    // Load messages between user 1 and user 2 from backend
+    this.inboxService.getMessagesBetween2Users(this.CURRENT_USER_ID, this.OTHER_USER_ID).subscribe({
+      next: (data) => {
+        console.log('Raw data from backend:', data);
+        this.messages = data.map(msg => ({
+          id: msg.id,
+          senderId: msg.senderId,
+          recipientId: msg.recipientId,
+          text: msg.text,
+          timestamp: new Date(),
+          isRead: false
+        }));
+        this.isLoading = false;
+        this.shouldScroll = true;
+        console.log('Messages loaded and mapped:', this.messages);
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error loading messages:', error);
+        this.isLoading = false;
+        // Show fallback message if backend fails
+        this.messages = [
+          {
+            id: 1,
+            senderId: this.OTHER_USER_ID,
+            recipientId: this.CURRENT_USER_ID,
+            text: 'Nu au fost găsite mesaje. Conectează backend-ul!',
+            timestamp: new Date(),
+            isRead: true
+          }
+        ];
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   ngAfterViewChecked(): void {
@@ -54,128 +102,27 @@ export class InboxComponent implements OnInit, AfterViewChecked {
   }
 
   loadContacts(): void {
-    // Mock contacts data
+    // Single mock contact - Dorel
     this.contacts = [
       {
         id: 2,
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@example.com',
+        firstName: 'Dorel',
+        lastName: 'Asd',
+        email: 'email2@email.com',
         isOnline: true,
-        unreadCount: 2,
-        lastMessage: {
-          id: 1,
-          senderId: 2,
-          recipientId: 1,
-          text: 'Hey! Are we still meeting today?',
-          timestamp: new Date(Date.now() - 300000),
-          isRead: false
-        }
-      },
-      {
-        id: 3,
-        firstName: 'Jane',
-        lastName: 'Smith',
-        email: 'jane@example.com',
-        isOnline: false,
         unreadCount: 0,
-        lastMessage: {
-          id: 2,
-          senderId: 1,
-          recipientId: 3,
-          text: 'Thanks for the update!',
-          timestamp: new Date(Date.now() - 3600000),
-          isRead: true
-        }
-      },
-      {
-        id: 4,
-        firstName: 'Mike',
-        lastName: 'Johnson',
-        email: 'mike@example.com',
-        isOnline: true,
-        unreadCount: 5,
-        lastMessage: {
-          id: 3,
-          senderId: 4,
-          recipientId: 1,
-          text: 'Can you review the PR?',
-          timestamp: new Date(Date.now() - 7200000),
-          isRead: false
-        }
-      },
-      {
-        id: 5,
-        firstName: 'Sarah',
-        lastName: 'Williams',
-        email: 'sarah@example.com',
-        isOnline: false,
-        unreadCount: 0,
-        lastMessage: {
-          id: 4,
-          senderId: 1,
-          recipientId: 5,
-          text: 'See you tomorrow!',
-          timestamp: new Date(Date.now() - 86400000),
-          isRead: true
-        }
+        lastMessage: undefined
       }
     ];
   }
 
+  loadMockContacts(): void {
+    this.loadContacts();
+  }
+
   loadConversation(contact: Contact): void {
-    // Mock conversation data
-    this.messages = [
-      {
-        id: 1,
-        senderId: contact.id,
-        recipientId: this.CURRENT_USER_ID,
-        text: 'Hi there! How are you doing?',
-        timestamp: new Date(Date.now() - 7200000),
-        isRead: true
-      },
-      {
-        id: 2,
-        senderId: this.CURRENT_USER_ID,
-        recipientId: contact.id,
-        text: 'Hey! I\'m doing great, thanks for asking!',
-        timestamp: new Date(Date.now() - 7100000),
-        isRead: true
-      },
-      {
-        id: 3,
-        senderId: contact.id,
-        recipientId: this.CURRENT_USER_ID,
-        text: 'That\'s awesome! I wanted to discuss the project with you.',
-        timestamp: new Date(Date.now() - 7000000),
-        isRead: true
-      },
-      {
-        id: 4,
-        senderId: this.CURRENT_USER_ID,
-        recipientId: contact.id,
-        text: 'Sure! What would you like to know?',
-        timestamp: new Date(Date.now() - 6900000),
-        isRead: true
-      },
-      {
-        id: 5,
-        senderId: contact.id,
-        recipientId: this.CURRENT_USER_ID,
-        text: contact.lastMessage?.text || 'Latest message',
-        timestamp: contact.lastMessage?.timestamp || new Date(),
-        isRead: contact.lastMessage?.isRead || false
-      }
-    ];
-
-    this.shouldScroll = true;
-
-    // Mark messages as read
-    if (contact.unreadCount > 0) {
-      this.contacts = this.contacts.map(c =>
-        c.id === contact.id ? { ...c, unreadCount: 0 } : c
-      );
-    }
+    // Load messages from backend when contact is selected
+    this.loadMessagesFromBackend();
   }
 
   selectContact(contact: Contact): void {
@@ -188,25 +135,53 @@ export class InboxComponent implements OnInit, AfterViewChecked {
       return;
     }
 
-    const message: Message = {
-      id: this.messages.length + 1,
-      senderId: this.CURRENT_USER_ID,
-      recipientId: this.selectedContact.id,
+    const addMessageRequest = {
       text: this.newMessage.trim(),
-      timestamp: new Date(),
-      isRead: false
+      senderId: this.CURRENT_USER_ID,
+      recipientId: this.selectedContact.id
     };
 
-    this.messages.push(message);
-    this.newMessage = '';
-    this.shouldScroll = true;
+    this.inboxService.addMessage(addMessageRequest).subscribe({
+      next: (response) => {
+        const message: Message = {
+          id: response.id,
+          senderId: this.CURRENT_USER_ID,
+          recipientId: this.selectedContact!.id,
+          text: response.text,
+          timestamp: new Date(),
+          isRead: false
+        };
 
-    // Update contact's last message
-    this.contacts = this.contacts.map(c =>
-      c.id === this.selectedContact?.id
-        ? { ...c, lastMessage: message }
-        : c
-    );
+        this.messages.push(message);
+        this.newMessage = '';
+        this.shouldScroll = true;
+        this.cdr.markForCheck();
+
+        // Update contact's last message
+        this.contacts = this.contacts.map(c =>
+          c.id === this.selectedContact?.id
+            ? { ...c, lastMessage: message }
+            : c
+        );
+      },
+      error: (error) => {
+        console.error('Error sending message:', error);
+        // Fallback to local message
+        const message: Message = {
+          id: this.messages.length + 1,
+          senderId: this.CURRENT_USER_ID,
+          recipientId: this.selectedContact!.id,
+          text: this.newMessage.trim(),
+          timestamp: new Date(),
+          isRead: false
+        };
+
+        this.messages.push(message);
+        this.newMessage = '';
+        this.shouldScroll = true;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   onKeyPress(event: KeyboardEvent): void {

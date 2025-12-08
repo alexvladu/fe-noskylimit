@@ -1,7 +1,8 @@
-import {Component, inject} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {Router} from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { SetupProfileService } from '../../services/user/setup-profile.service';
 
 @Component({
   selector: 'app-setup-profile',
@@ -9,7 +10,10 @@ import {Router} from '@angular/router';
   templateUrl: './setup-profile.html',
   styleUrl: './setup-profile.scss',
 })
-export class SetupProfile {
+export class SetupProfile implements OnInit {
+  private setupProfileService = inject(SetupProfileService);
+  private router = inject(Router);
+
   step = 1;
   totalSteps = 4;
 
@@ -22,29 +26,47 @@ export class SetupProfile {
   ];
   availableLanguages: string[] = ['English', 'Romanian', 'Spanish', 'French', 'German'];
 
-  profile = {
+  profile: {
+    age: number | null;
+    gender: string;
+    height: number | null;
+    location: string;
+    languages: string[];
+    photos: File[];
+    photoPreviews: string[];
+    hobbies: string[];
+    bio: string;
+    sexualOrientation: string;
+    relationshipType: string;
+    ageRangeMin: number;
+    ageRangeMax: number;
+  } = {
     age: null,
     gender: '',
     height: null,
     location: '',
-    languages: [] as string[],
-
-    photos: [] as File[],
-    photoPreviews: [] as string[],
-
-    hobbies: [] as string[],
+    languages: [],
+    photos: [],
+    photoPreviews: [],
+    hobbies: [],
     bio: '',
-
     sexualOrientation: '',
     relationshipType: '',
     ageRangeMin: 18,
     ageRangeMax: 50
   };
 
-  constructor(private router: Router) {}
-
   ngOnInit() {
-    // TODO: BACKEND - GET hobbies, languages from API if needed
+    // Load hobbies and languages from API
+    this.setupProfileService.getAvailableHobbies().subscribe({
+      next: (hobbies) => this.availableHobbies = hobbies,
+      error: (err) => console.error('Error loading hobbies:', err)
+    });
+
+    this.setupProfileService.getAvailableLanguages().subscribe({
+      next: (languages) => this.availableLanguages = languages,
+      error: (err) => console.error('Error loading languages:', err)
+    });
   }
 
   // --- Logică pentru Hobbies (Max 5) ---
@@ -128,16 +150,43 @@ export class SetupProfile {
   }
 
   submitProfile() {
-    // TODO: BACKEND - implementare apel API pentru salvare profil
+    const userId = this.getUserIdFromAuth(); // TODO: Implement this method based on your auth system
 
-    /* const formData = new FormData();
+    const formData = new FormData();
+    formData.append('age', this.profile.age!.toString());
+    formData.append('gender', this.profile.gender.toString());
+    formData.append('height', this.profile.height!.toString());
+    formData.append('location', this.profile.location);
 
-    // Logica adaugare campuri in formData...
+    this.profile.languages.forEach(language => formData.append('languages', language));
+    this.profile.photos.forEach(photo => formData.append('photos', photo));
+    this.profile.hobbies.forEach(hobby => formData.append('hobbies', hobby));
 
-    this.apiService.completeProfile(formData).subscribe({
-      next: () => this.router.navigate(['/home']),
-      error: (err) => console.error(err)
+    formData.append('bio', this.profile.bio);
+    formData.append('sexualOrientation', this.profile.sexualOrientation);
+    formData.append('relationshipType', this.profile.relationshipType);
+    formData.append('ageRangeMin', this.profile.ageRangeMin.toString());
+    formData.append('ageRangeMax', this.profile.ageRangeMax.toString());
+
+    this.setupProfileService.completeProfile(userId, formData).subscribe({
+      next: (response) => {
+        console.log('Profile setup successful:', response);
+        this.router.navigate(['/home']);
+      },
+      error: (err) => {
+        console.error('Error setting up profile:', err);
+        alert('Failed to setup profile. Please try again.');
+      }
     });
-    */
+  }
+
+  //TODO: Implement this based on your authentication system
+  private getUserIdFromAuth(): number {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // implementation to extract user ID from token
+      return 1;
+    }
+    throw new Error('User not authenticated');
   }
 }

@@ -36,7 +36,7 @@ export const routes: Routes = [
       {
         path: 'inbox',
         component: InboxComponent,
-        // canActivate: [SomeGuard]
+        canActivate: [AuthGuard]
       },
       {
         path: '',

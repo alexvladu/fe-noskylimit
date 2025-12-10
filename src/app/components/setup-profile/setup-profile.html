@@ -4,6 +4,19 @@
   </div>
 
   <form>
+    @if (step === 0) {
+      <div class="step-content fade-in">
+        <h2>Create Your Account</h2>
+
+        <input type="text" placeholder="First Name" [(ngModel)]="credentials.firstName" name="firstName" required>
+        <input type="text" placeholder="Last Name" [(ngModel)]="credentials.lastName" name="lastName" required>
+        <input type="email" placeholder="Email" [(ngModel)]="credentials.email" name="email" required>
+        <input type="password" placeholder="Password (min 6 characters)" [(ngModel)]="credentials.password" name="password" required minlength="6">
+
+        <p class="hint">Let's get started by creating your account!</p>
+      </div>
+    }
+
     @if (step === 1) {
       <div class="step-content fade-in">
         <h2>The Basics</h2>
@@ -14,21 +27,66 @@
         </div>
 
         <select [(ngModel)]="profile.gender" name="gender">
-          <option value="" disabled selected>Select Gender</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="non-binary">Non-binary</option>
+          <option [ngValue]="null" disabled selected>Select Gender</option>
+          <option [ngValue]="0">Male</option>
+          <option [ngValue]="1">Female</option>
+          <option [ngValue]="2">Other</option>
         </select>
 
         <input type="text" placeholder="City / Location" [(ngModel)]="profile.location" name="location">
 
         <label>Languages Spoken</label>
-        <select multiple [(ngModel)]="profile.languages" name="languages" class="multi-select">
-          @for (lang of availableLanguages; track lang) {
-            <option [value]="lang">{{ lang }}</option>
-          }
-        </select>
-        <small>Hold Ctrl/Cmd to select multiple</small>
+        <div class="languages-grid">
+          <div class="language-chip"
+               [class.selected]="isLanguageSelected(0)"
+               (click)="toggleLanguage(0)">
+            <span class="language-name">English</span>
+            @if (isLanguageSelected(0)) { <span class="check-icon">✓</span> }
+          </div>
+          <div class="language-chip"
+               [class.selected]="isLanguageSelected(1)"
+               (click)="toggleLanguage(1)">
+            <span class="language-name">Romanian</span>
+            @if (isLanguageSelected(1)) { <span class="check-icon">✓</span> }
+          </div>
+          <div class="language-chip"
+               [class.selected]="isLanguageSelected(2)"
+               (click)="toggleLanguage(2)">
+            <span class="language-name">Spanish</span>
+            @if (isLanguageSelected(2)) { <span class="check-icon">✓</span> }
+          </div>
+          <div class="language-chip"
+               [class.selected]="isLanguageSelected(3)"
+               (click)="toggleLanguage(3)">
+            <span class="language-name">French</span>
+            @if (isLanguageSelected(3)) { <span class="check-icon">✓</span> }
+          </div>
+          <div class="language-chip"
+               [class.selected]="isLanguageSelected(4)"
+               (click)="toggleLanguage(4)">
+            <span class="language-name">German</span>
+            @if (isLanguageSelected(4)) { <span class="check-icon">✓</span> }
+          </div>
+          <div class="language-chip"
+               [class.selected]="isLanguageSelected(5)"
+               (click)="toggleLanguage(5)">
+            <span class="language-name">Italian</span>
+            @if (isLanguageSelected(5)) { <span class="check-icon">✓</span> }
+          </div>
+          <div class="language-chip"
+               [class.selected]="isLanguageSelected(6)"
+               (click)="toggleLanguage(6)">
+            <span class="language-name">Portuguese</span>
+            @if (isLanguageSelected(6)) { <span class="check-icon">✓</span> }
+          </div>
+          <div class="language-chip"
+               [class.selected]="isLanguageSelected(7)"
+               (click)="toggleLanguage(7)">
+            <span class="language-name">Russian</span>
+            @if (isLanguageSelected(7)) { <span class="check-icon">✓</span> }
+          </div>
+        </div>
+        <small>Select all languages you speak</small>
       </div>
     }
 
@@ -36,16 +94,20 @@
       <div class="step-content fade-in">
         <h2>Your Photos</h2>
         <div class="photo-grid">
-          @for (pic of profile.photoPreviews; track pic) {
-            <div class="photo-card" [style.backgroundImage]="'url(' + pic + ')'"></div>
+          @for (pic of profile.photoPreviews; track $index; let idx = $index) {
+            <div class="photo-card" [style.backgroundImage]="'url(' + pic + ')'">
+              <button type="button" class="delete-photo-btn" (click)="removePhoto(idx)" title="Remove photo">
+                ✕
+              </button>
+            </div>
           }
 
-          <label class="upload-btn">
+          <label class="upload-btn" [class.disabled]="profile.photos.length >= 6">
             <span>+</span>
-            <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" multiple hidden [disabled]="profile.photos.length >= 6">
           </label>
         </div>
-        <p class="hint">Add at least 2 photos to get noticed.</p>
+        <p class="hint">Add at least 2 photos (maximum 6).</p>
       </div>
     }
 
@@ -85,17 +147,20 @@
         <h2>Preferences</h2>
 
         <label>I am looking for...</label>
-        <select [(ngModel)]="profile.relationshipType" name="relType">
-          <option value="serious">Serious Relationship</option>
-          <option value="casual">Casual Dating</option>
-          <option value="friendship">Friendship</option>
+        <select [(ngModel)]="profile.relationshipGoal" name="relType">
+          <option [ngValue]="null" disabled selected>Select relationship goal</option>
+          <option [ngValue]="0">Serious Relationship</option>
+          <option [ngValue]="1">Casual Dating</option>
+          <option [ngValue]="2">Friendship</option>
         </select>
 
         <label>My Orientation</label>
         <select [(ngModel)]="profile.sexualOrientation" name="orientation">
-          <option value="straight">Straight</option>
-          <option value="gay">Gay</option>
-          <option value="bisexual">Bisexual</option>
+          <option [ngValue]="null" disabled selected>Select orientation</option>
+          <option [ngValue]="0">Straight</option>
+          <option [ngValue]="1">Gay</option>
+          <option [ngValue]="2">Bisexual</option>
+          <option [ngValue]="3">Other</option>
         </select>
 
         <label>Age Range: {{profile.ageRangeMin}} - {{profile.ageRangeMax}}</label>
@@ -108,7 +173,7 @@
     }
 
     <div class="actions">
-      <button type="button" *ngIf="step > 1" (click)="prevStep()" class="secondary-btn">Back</button>
+      <button type="button" *ngIf="step > 0" (click)="prevStep()" class="secondary-btn">Back</button>
       <button type="button" (click)="nextStep()" class="primary-btn">
         {{ step === totalSteps ? 'Finish' : 'Next' }}
       </button>

@@ -175,6 +175,54 @@ small {
   }
 }
 
+// --- LANGUAGES (Similar to hobbies) ---
+.languages-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+
+.language-chip {
+  border: 1px solid $border-color;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+  user-select: none;
+
+  .language-name {
+    display: inline-block;
+  }
+
+  .check-icon {
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+
+  &:hover {
+    background: #f9f9f9;
+    border-color: #ccc;
+  }
+
+  &.selected {
+    background: linear-gradient(135deg, $gradient-start, $gradient-end);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 10px rgba(238, 9, 121, 0.2);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
 .input-group textarea {
   resize: none;
 }
@@ -194,6 +242,38 @@ small {
   border-radius: 10px;
   background-color: #f0f0f0;
   border: 1px solid #eee;
+  position: relative;
+  overflow: hidden;
+
+  .delete-photo-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #ff0000;
+    font-weight: bold;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      background: #ff0000;
+      color: white;
+      transform: scale(1.1);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
 }
 
 .upload-btn {
@@ -204,9 +284,24 @@ small {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: all 0.2s;
 
   span { font-size: 2rem; color: $gradient-end; }
-  &:hover { background: rgba(238, 9, 121, 0.05); }
+
+  &:hover {
+    background: rgba(238, 9, 121, 0.05);
+    border-color: $gradient-start;
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+
+    &:hover {
+      background: transparent;
+      border-color: $gradient-end;
+    }
+  }
 }
 
 .hint {
@@ -246,3 +341,4 @@ small {
     }
   }
 }
+

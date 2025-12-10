@@ -2,7 +2,6 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -18,38 +17,48 @@ export class RegisterComponent {
   isLoading = false;
   error = '';
 
-  private authService = inject(AuthService);
   private router = inject(Router);
 
   onRegister() {
     this.error = '';
     this.isLoading = true;
 
+    // Validate fields
     if (!this.name || !this.email || !this.password) {
       this.error = 'All fields are required.';
       this.isLoading = false;
       return;
     }
 
-    this.authService.register({ name: this.name, email: this.email, password: this.password }).subscribe({
-      next: () => {
-        this.authService.login({ email: this.email, password: this.password }).subscribe({
-          next: (response: any) => {
-            if (response && response.token) {
-              this.authService.saveToken(response.token);
-            }
-            this.router.navigate(['/setup-profile']);
-          },
-          error: (err) => {
-            console.error('Auto-login failed', err);
-            this.router.navigate(['/login']);
-          }
-        });
-      },
-      error: () => {
-        this.error = 'Registration failed';
-        this.isLoading = false;
-      }
-    });
+    // Basic validation
+    if (!this.email.includes('@')) {
+      this.error = 'Please enter a valid email address.';
+      this.isLoading = false;
+      return;
+    }
+
+    if (this.password.length < 6) {
+      this.error = 'Password must be at least 6 characters long.';
+      this.isLoading = false;
+      return;
+    }
+
+    // Split name into first and last name (simple approach)
+    const nameParts = this.name.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || nameParts[0] || ''; // Use first name as last name if only one name provided
+
+    // Store credentials in sessionStorage to pass to setup-profile
+    const credentials = {
+      firstName: firstName,
+      lastName: lastName,
+      email: this.email,
+      password: this.password
+    };
+
+    sessionStorage.setItem('registrationCredentials', JSON.stringify(credentials));
+
+    // Navigate to setup-profile to complete registration
+    this.router.navigate(['/setup-profile']);
   }
 }

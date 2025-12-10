@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { environment } from '../../../enviroment';
 import { LoginDto } from '../../interfaces/login-dto';
+import { LoginResponse } from '../../interfaces/login-response';
 
 @Injectable({
   providedIn: 'root'

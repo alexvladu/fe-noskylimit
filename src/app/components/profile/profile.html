@@ -1,0 +1,92 @@
+<div class="profile-container" *ngIf="!isLoading">
+    <div class="profile-header">
+        <h1>My Profile</h1>
+        <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+
+    <div class="error-message" *ngIf="error">{{ error }}</div>
+
+    <div class="profile-content" *ngIf="user">
+        <!-- Photos Section -->
+        <div class="photos-section">
+            <h2>Photos</h2>
+            <div class="photos-grid">
+                <div class="photo-item" *ngFor="let photo of user.photos">
+                    <img [src]="getImageUrl(photo)" alt="Profile photo" />
+                </div>
+                <div class="no-photos" *ngIf="!user.photos || user.photos.length === 0">
+
+                    <!-- Basic Info Section -->
+                    <div class="info-section">
+                        <div class="section-header">
+                            <h2>Basic Information</h2>
+                            <button class="edit-btn" (click)="toggleEdit()">
+                                {{ isEditing ? 'Cancel' : 'Edit Profile' }}
+                            </button>
+                        </div>
+
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Name:</label>
+                                <span>{{ user.firstName }} {{ user.lastName }}</span>
+                            </div>
+
+                            <div class="info-item">
+                                <label>Email:</label>
+                                <span>{{ user.email }}</span>
+                            </div>
+
+                            <div class="info-item">
+                                <label>Age:</label>
+                                <span *ngIf="!isEditing">{{ user.age || 'Not set' }}</span>
+                                <input *ngIf="isEditing" type="number" [(ngModel)]="editData.age" />
+                            </div>
+
+                            <div class="info-item">
+                                <label>Height:</label>
+                                <span *ngIf="!isEditing">{{ user.height ? user.height + ' cm' : 'Not set' }}</span>
+                                <input *ngIf="isEditing" type="number" [(ngModel)]="editData.height" />
+                            </div>
+
+                            <div class="info-item">
+                                <label>Gender:</label>
+                                <span>{{ getGenderLabel(user.gender) }}</span>
+                            </div>
+
+                            <div class="info-item">
+                                <label>Location:</label>
+                                <span *ngIf="!isEditing">{{ user.city || 'Not set' }}</span>
+                                <input *ngIf="isEditing" type="text" [(ngModel)]="editData.city" />
+                            </div>
+
+                            <div class="info-item full-width">
+                                <label>Bio:</label>
+                                <span *ngIf="!isEditing">{{ user.bio || 'No bio yet' }}</span>
+                                <textarea *ngIf="isEditing" [(ngModel)]="editData.bio" rows="4"></textarea>
+                            </div>
+
+                            <div class="info-item">
+                                <label>Sexual Orientation:</label>
+                                <span>{{ getOrientationLabel(user.sexualOrientation) }}</span>
+                            </div>
+
+                            <div class="info-item">
+                                <label>Relationship Goal:</label>
+                                <span>{{ getRelationshipGoalLabel(user.relationshipGoal) }}</span>
+                            </div>
+
+                            <div class="info-item">
+                                <label>Age Preference:</label>
+                                <span>{{ user.preferredAgeMin || 18 }} - {{ user.preferredAgeMax || 50 }}</span>
+                            </div>
+                        </div>
+
+                        <button *ngIf="isEditing" class="save-btn" (click)="saveProfile()">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" *ngIf="isLoading">
+                <div class="spinner"></div>
+                <p>Loading profile...</p>
+            </div>

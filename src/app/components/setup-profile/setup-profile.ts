@@ -1,7 +1,7 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {Router} from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 
 interface RegistrationData {
@@ -281,7 +281,8 @@ export class SetupProfile implements OnInit {
       'straight': '0',
       'gay': '1',
       'lesbian': '2',
-      'bisexual': '3'
+      'bisexual': '3',
+      'other': '4'
     };
     return map[orientation] || '0';
   }

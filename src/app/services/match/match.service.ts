@@ -54,7 +54,7 @@ export interface CheckMatchResponse {
 export class MatchService {
   private baseUrl = `${environment.baseUrl}api/matches`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Creates a new match (like) with another user.
@@ -90,6 +90,13 @@ export class MatchService {
    */
   deleteMatch(matchId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${matchId}`);
+  }
+
+  /**
+   * Adds a dislike for a user (swipe left).
+   */
+  addDislike(dislikedUserId: number): Observable<MatchResponse> {
+    return this.http.post<MatchResponse>(`${this.baseUrl}/dislike/${dislikedUserId}`, {});
   }
 
   /**

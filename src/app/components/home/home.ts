@@ -67,7 +67,7 @@ export class HomeComponent implements OnInit {
           bio: user.bio,
           photos: user.photos || []
         };
-        
+
         console.log('Card created:', card);
         this.cards.push(card);
         this.isLoading = false;
@@ -115,22 +115,43 @@ export class HomeComponent implements OnInit {
             console.log('Match created:', response);
             if (response.isMutual) {
               console.log('Mutual match!');
+              // TODO: Show mutual match notification
             }
+            // Load next user after successful like
+            this.finishSwipe();
           },
           error: (error) => {
             console.error('Error creating match:', error);
+            // Load next user even if there was an error
+            this.finishSwipe();
+          }
+        });
+      } else {
+        // Create a dislike (swipe left)
+        this.matchService.addDislike(currentCard.id).subscribe({
+          next: (response) => {
+            console.log('Dislike recorded:', response);
+            // Load next user after successful dislike
+            this.finishSwipe();
+          },
+          error: (error) => {
+            console.error('Error recording dislike:', error);
+            // Load next user even if there was an error
+            this.finishSwipe();
           }
         });
       }
-
-      this.cards.pop();  // Remove top card
-      this.animationState = '';
-      this.isAnimating = false;
-      
-      // Load next user
-      this.loadNextUser();
-      this.cdr.markForCheck();
     }, 500); // Matches CSS animation duration
+  }
+
+  private finishSwipe() {
+    this.cards.pop();  // Remove top card
+    this.animationState = '';
+    this.isAnimating = false;
+
+    // Load next user
+    this.loadNextUser();
+    this.cdr.markForCheck();
   }
 
   @HostListener('window:keydown', ['$event'])

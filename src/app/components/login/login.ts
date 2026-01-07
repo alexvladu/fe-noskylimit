@@ -33,11 +33,18 @@ export class LoginComponent {
 
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (response: any) => {
-        this.authService.saveToken(response.token);
-        this.router.navigate(['/']);
+        if (response && response.token) {
+          this.authService.saveToken(response.token);
+          this.router.navigate(['/']);
+        } else {
+          this.error = 'Login successful but no token received.';
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        }
       },
-      error: () => {
-        this.error = 'Access denied';
+      error: (err) => {
+        console.error('Login failed', err);
+        this.error = err?.error?.message || 'Access denied. Check your credentials.';
         this.isLoading = false;
         this.cdr.markForCheck();
       }

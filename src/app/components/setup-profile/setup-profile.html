@@ -4,6 +4,10 @@
   </div>
 
   <form>
+    @if (error) {
+      <div class="error-message">{{ error }}</div>
+    }
+
     @if (step === 1) {
       <div class="step-content fade-in">
         <h2>The Basics</h2>
@@ -36,8 +40,10 @@
       <div class="step-content fade-in">
         <h2>Your Photos</h2>
         <div class="photo-grid">
-          @for (pic of profile.photoPreviews; track pic) {
-            <div class="photo-card" [style.backgroundImage]="'url(' + pic + ')'"></div>
+          @for (pic of profile.photoPreviews; track pic; let i = $index) {
+            <div class="photo-card" [style.backgroundImage]="'url(' + pic + ')'">
+              <button type="button" class="remove-btn" (click)="removePhoto(i)" title="Remove photo">×</button>
+            </div>
           }
 
           <label class="upload-btn">
@@ -45,7 +51,7 @@
             <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
           </label>
         </div>
-        <p class="hint">Add at least 2 photos to get noticed.</p>
+        <p class="hint">Add at least 2 photos to get noticed. (Max 6)</p>
       </div>
     }
 
@@ -86,15 +92,18 @@
 
         <label>I am looking for...</label>
         <select [(ngModel)]="profile.relationshipType" name="relType">
+          <option value="">Select...</option>
           <option value="serious">Serious Relationship</option>
           <option value="casual">Casual Dating</option>
-          <option value="friendship">Friendship</option>
+          <option value="marriage">Marriage</option>
         </select>
 
         <label>My Orientation</label>
         <select [(ngModel)]="profile.sexualOrientation" name="orientation">
+          <option value="">Select...</option>
           <option value="straight">Straight</option>
           <option value="gay">Gay</option>
+          <option value="lesbian">Lesbian</option>
           <option value="bisexual">Bisexual</option>
         </select>
 
@@ -108,10 +117,10 @@
     }
 
     <div class="actions">
-      <button type="button" *ngIf="step > 1" (click)="prevStep()" class="secondary-btn">Back</button>
-      <button type="button" (click)="nextStep()" class="primary-btn">
-        {{ step === totalSteps ? 'Finish' : 'Next' }}
-      </button>
-    </div>
-  </form>
-</div>
+      <button type="button" *ngIf="step > 1" (click)="prevStep()" class="secondary-btn" [disabled]="isSubmitting">Back</button>
+      <button type="button" (click)="nextStep()" class="primary-btn" [disabled]="isSubmitting">
+        @if (isSubmitting) {
+          Creating...
+        } @else {
+          {{ step === totalSteps ? 'Finish' : 'Next' }}
+        }

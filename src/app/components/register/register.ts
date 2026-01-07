@@ -12,9 +12,12 @@ import { AuthService } from '../../services/auth/auth.service';
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
-  name = '';
+  firstName = '';
+  lastName = '';
+  username = '';
   email = '';
   password = '';
+  confirmPassword = '';
   isLoading = false;
   error = '';
 
@@ -23,33 +26,33 @@ export class RegisterComponent {
 
   onRegister() {
     this.error = '';
-    this.isLoading = true;
 
-    if (!this.name || !this.email || !this.password) {
+    // Validation
+    if (!this.firstName || !this.lastName || !this.username || !this.email || !this.password || !this.confirmPassword) {
       this.error = 'All fields are required.';
-      this.isLoading = false;
       return;
     }
 
-    this.authService.register({ name: this.name, email: this.email, password: this.password }).subscribe({
-      next: () => {
-        this.authService.login({ email: this.email, password: this.password }).subscribe({
-          next: (response: any) => {
-            if (response && response.token) {
-              this.authService.saveToken(response.token);
-            }
-            this.router.navigate(['/setup-profile']);
-          },
-          error: (err) => {
-            console.error('Auto-login failed', err);
-            this.router.navigate(['/login']);
-          }
-        });
-      },
-      error: () => {
-        this.error = 'Registration failed';
-        this.isLoading = false;
-      }
-    });
+    if (this.password !== this.confirmPassword) {
+      this.error = 'Passwords do not match.';
+      return;
+    }
+
+    if (this.password.length < 6) {
+      this.error = 'Password must be at least 6 characters.';
+      return;
+    }
+
+    // Store registration data in session storage for setup-profile to use
+    sessionStorage.setItem('registerData', JSON.stringify({
+      firstName: this.firstName,
+      lastName: this.lastName,
+      username: this.username,
+      email: this.email,
+      password: this.password
+    }));
+
+    // Navigate to setup profile
+    this.router.navigate(['/setup-profile']);
   }
 }

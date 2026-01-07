@@ -1,4 +1,9 @@
 <div class="chat-wrapper">
+  <!-- Error Alert -->
+  <div *ngIf="error" class="error-banner">
+    {{ error }}
+  </div>
+
   <!-- Contacts Sidebar -->
   <div class="contacts-sidebar">
     <div class="sidebar-header">
@@ -6,6 +11,15 @@
     </div>
 
     <div class="contacts-list">
+      <div *ngIf="contacts.length === 0 && !isLoading" class="no-contacts-message">
+        <p>No matches yet!</p>
+        <small>Start swiping to find your matches</small>
+      </div>
+
+      <div *ngIf="isLoading" class="loading-state">
+        <p>Loading your matches...</p>
+      </div>
+
       <div
         *ngFor="let contact of contacts"
         class="contact-card"
@@ -73,15 +87,24 @@
 
       <!-- Messages Area -->
       <div class="messages-area">
+        <div *ngIf="isLoading" class="loading-spinner">
+          Loading messages...
+        </div>
+        
         <div
           *ngFor="let message of messages"
           class="message-bubble"
-          [class.sent]="message.senderId === CURRENT_USER_ID"
-          [class.received]="message.senderId !== CURRENT_USER_ID"
+          [class.sent]="isCurrentUserMessage(message)"
+          [class.received]="!isCurrentUserMessage(message)"
         >
           <div class="message-text">{{ message.text }}</div>
           <div class="message-time">{{ formatMessageTime(message.timestamp) }}</div>
         </div>
+        
+        <div *ngIf="messages.length === 0 && !isLoading" class="no-messages">
+          No messages yet. Start a conversation!
+        </div>
+
         <div #messagesEnd></div>
       </div>
 
@@ -93,11 +116,12 @@
           [(ngModel)]="newMessage"
           (keypress)="onKeyPress($event)"
           class="message-input"
+          [disabled]="isLoading"
         />
         <button
           type="button"
           class="send-button"
-          [disabled]="!newMessage.trim()"
+          [disabled]="!newMessage.trim() || isLoading"
           (click)="sendMessage()"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -115,7 +139,7 @@
 
     <ng-template #noSelection>
       <div class="no-chat-selected">
-        
+        <p>Select a conversation to start messaging</p>
       </div>
     </ng-template>
   </div>

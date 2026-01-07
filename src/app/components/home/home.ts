@@ -1,12 +1,18 @@
-import { Component, HostListener, inject } from '@angular/core';
+import { Component, HostListener, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { PingService } from '../../services/ping/ping.service';
+import { MatchService, RandomUserDto } from '../../services/match/match.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-export interface User {
+export interface Card {
   id: number;
-  name: string;
-  img: string;
+  firstName: string;
+  lastName: string;
+  age?: number;
+  height?: number;
+  location?: string;
+  bio?: string;
+  photos: Array<{ id: number; imageUrl: string }>;
 }
 
 @Component({
@@ -16,47 +22,17 @@ export interface User {
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
 
   private pingService = inject(PingService);
+  private matchService = inject(MatchService);
+  private cdr = inject(ChangeDetectorRef);
 
-  cards: User[] = [
-  { 
-    id: 5, 
-    name: 'Sophie, 24', 
-    img: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=600&q=80' 
-  },
-  { 
-    id: 4, 
-    name: 'Daniel, 27',  
-    img: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=600'
-  },
-  { 
-    id: 3, 
-    name: 'Emma, 23', 
-    img: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600'
-
-  },
-  { 
-    id: 2, 
-    name: 'Michael, 26', 
-    img: 'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?auto=compress&cs=tinysrgb&w=600'
-  },
-  { 
-    id: 1, 
-    name: 'Isabella, 22', 
-    img: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600'
-  }
-];
-
-
+  cards: Card[] = [];
   animationState: '' | 'swipeleft' | 'swiperight' = '';
   isAnimating = false;
-
-  constructor() {
-    // Reverse cards so User 1 is shown first
-    this.cards.reverse();
-  }
+  isLoading = true;
+  error = '';
 
   ngOnInit(): void {
     this.pingService.ping().subscribe({
@@ -67,19 +43,93 @@ export class HomeComponent {
         console.error('Ping error:', err);
       }
     });
+
+    this.loadNextUser();
+  }
+
+  loadNextUser(): void {
+    if (this.isAnimating) return;
+
+    this.isLoading = true;
+    this.error = '';
+    this.cdr.markForCheck();
+
+    this.matchService.getRandomUnmatchedUser().subscribe({
+      next: (user: RandomUserDto) => {
+        console.log('Loaded user:', user);
+        const card: Card = {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          age: user.age,
+          height: user.height,
+          location: user.location,
+          bio: user.bio,
+          photos: user.photos || []
+        };
+        
+        console.log('Card created:', card);
+        this.cards.push(card);
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error loading user:', error);
+        this.isLoading = false;
+        this.error = 'No more users available';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  getImageUrl(imageUrl: string): string {
+    if (!imageUrl) return '';
+    // Check if it already has the data URL prefix
+    if (imageUrl.startsWith('data:')) {
+      return imageUrl;
+    }
+    // Otherwise add the base64 prefix
+    return `data:image/jpeg;base64,${imageUrl}`;
+  }
+
+  onImageError(event: Event): void {
+    console.error('Image failed to load:', event);
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
   }
 
   swipe(direction: 'left' | 'right') {
-    if (this.isAnimating) return;
+    if (this.isAnimating || this.cards.length === 0) return;
 
     this.isAnimating = true;
     this.animationState =
       direction === 'left' ? 'swipeleft' : 'swiperight';
 
+    const currentCard = this.cards[this.cards.length - 1];
+
     setTimeout(() => {
+      if (direction === 'right') {
+        // Create a match (like)
+        this.matchService.createMatch(currentCard.id).subscribe({
+          next: (response) => {
+            console.log('Match created:', response);
+            if (response.isMutual) {
+              console.log('Mutual match!');
+            }
+          },
+          error: (error) => {
+            console.error('Error creating match:', error);
+          }
+        });
+      }
+
       this.cards.pop();  // Remove top card
       this.animationState = '';
       this.isAnimating = false;
+      
+      // Load next user
+      this.loadNextUser();
+      this.cdr.markForCheck();
     }, 500); // Matches CSS animation duration
   }
 

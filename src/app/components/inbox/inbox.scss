@@ -375,3 +375,44 @@
 .contacts-list::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+/* Empty State Messages */
+.no-contacts-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+
+  p {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  small {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.no-messages {
+  text-align: center;
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+}

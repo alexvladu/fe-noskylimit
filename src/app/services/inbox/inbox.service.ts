@@ -1,40 +1,45 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../enviroment';
+import { AuthService } from '../auth/auth.service';
 
-interface MessageDto {
+export interface MessageDto {
   id: number;
+  text: string;
+  senderId: number;
+  recipientId: number;
+  timestamp?: string;
+  sender?: { id: number; firstName: string; lastName: string };
+  recipient?: { id: number; firstName: string; lastName: string };
+}
+
+export interface AddMessageRequest {
   text: string;
   senderId: number;
   recipientId: number;
 }
 
-interface AddMessageRequest {
+export interface EditMessageRequest {
+  id: number;
   text: string;
-  senderId: number;
-  recipientId: number;
 }
 
-interface EditMessageRequest {
-  id: number;
-  content: string;
-}
-
-interface DeleteMessageRequest {
+export interface DeleteMessageRequest {
   id: number;
 }
 
-interface GetMessagesBetween2UsersRequest {
+export interface GetMessagesBetween2UsersRequest {
   firstUserId: number;
   secondUserId: number;
 }
 
-interface GetPaginatedMessagesBetween2UsersRequest {
+export interface GetPaginatedMessagesBetween2UsersRequest {
   pageNumber: number;
   pageSize: number;
 }
 
-interface PagedResponse<T> {
+export interface PagedResponse<T> {
   items: T[];
   totalCount: number;
   pageNumber: number;
@@ -45,9 +50,9 @@ interface PagedResponse<T> {
   providedIn: 'root'
 })
 export class InboxService {
-  private apiUrl = 'http://localhost:5098/api/messages'; // URL-ul backend-ului
-
-  constructor(private http: HttpClient) { }
+  private apiUrl = `${environment.baseUrl}api/messages`;
+  private http = inject(HttpClient);
+  private authService = inject(AuthService);
 
   // Get all messages
   getAllMessages(): Observable<MessageDto[]> {
@@ -93,4 +98,36 @@ export class InboxService {
       { params }
     );
   }
+
+  /**
+   * Extract userId from JWT token claims
+   */
+  getCurrentUserId(): number | null {
+    const token = this.authService.getToken();
+    if (!token) return null;
+
+    try {
+      const payload = this.parseJwt(token);
+      return payload?.userId ? parseInt(payload.userId, 10) : null;
+    } catch (e) {
+      console.error('Error parsing JWT token:', e);
+      return null;
+    }
+  }
+
+  /**
+   * Parse JWT token to extract claims
+   */
+  private parseJwt(token: string): any {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  }
 }
+

@@ -1,7 +1,8 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { InboxService } from '../../services/inbox/inbox.service';
+import { InboxService, MessageDto } from '../../services/inbox/inbox.service';
+import { MatchService, MatchDto } from '../../services/match/match.service';
 
 export interface User {
   id: number;
@@ -36,59 +37,107 @@ export interface Contact extends User {
 export class InboxComponent implements OnInit, AfterViewChecked {
   @ViewChild('messagesEnd') messagesEnd!: ElementRef;
 
-  readonly CURRENT_USER_ID = 1;
-  readonly OTHER_USER_ID = 2;
+  private inboxService = inject(InboxService);
+  private matchService = inject(MatchService);
+  private cdr = inject(ChangeDetectorRef);
+
+  currentUserId: number | null = null;
   contacts: Contact[] = [];
   selectedContact: Contact | null = null;
   messages: Message[] = [];
   newMessage = '';
   private shouldScroll = false;
   isLoading = false;
-
-  constructor(private inboxService: InboxService, private cdr: ChangeDetectorRef) { }
+  error = '';
 
   ngOnInit(): void {
-    // Load single mock contact (Dorel)
-    this.loadContacts();
-    
+    // Extract userId from JWT token
+    this.currentUserId = this.inboxService.getCurrentUserId();
+    if (!this.currentUserId) {
+      this.error = 'User not authenticated';
+      return;
+    }
+
+    // Load matched users as contacts
+    this.loadMatchedUserContacts();
+  }
+
+  loadMatchedUserContacts(): void {
+    if (!this.currentUserId) return;
+
+    this.isLoading = true;
+    this.error = '';
+    this.cdr.markForCheck();
+
+    // Get only mutual matches (both users have liked each other)
+    this.matchService.getCurrentUserMutualMatches().subscribe({
+      next: (matches: MatchDto[]) => {
+        console.log('Mutual matches loaded:', matches);
+        
+        if (matches.length === 0) {
+          this.contacts = [];
+          this.isLoading = false;
+          this.cdr.markForCheck();
+          return;
+        }
+
+        // Convert matches to contacts
+        this.contacts = matches
+          .filter(match => match.matchedUserDetails) // Filter out matches without user details
+          .map(match => {
+            const userDetails = match.matchedUserDetails!;
+            return {
+              id: userDetails.id,
+              firstName: userDetails.firstName,
+              lastName: userDetails.lastName,
+              email: '', // Email not available in MatchedUserDto
+              profilePhoto: userDetails.profilePhotoUrl,
+              isOnline: undefined,
+              unreadCount: 0,
+              lastMessage: undefined
+            };
+          });
+
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error loading matched users:', error);
+        this.isLoading = false;
+        this.error = 'Failed to load your matches';
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   loadMessagesFromBackend(): void {
+    if (!this.selectedContact || !this.currentUserId) return;
+
     this.isLoading = true;
-    this.messages = []; // Clear messages while loading
+    this.messages = [];
     this.cdr.markForCheck();
     
-    // Load messages between user 1 and user 2 from backend
-    this.inboxService.getMessagesBetween2Users(this.CURRENT_USER_ID, this.OTHER_USER_ID).subscribe({
+    // Load messages between current user and selected contact
+    this.inboxService.getMessagesBetween2Users(this.currentUserId, this.selectedContact.id).subscribe({
       next: (data) => {
-        console.log('Raw data from backend:', data);
+        console.log('Messages loaded:', data);
         this.messages = data.map(msg => ({
           id: msg.id,
           senderId: msg.senderId,
           recipientId: msg.recipientId,
           text: msg.text,
-          timestamp: new Date(),
+          timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
           isRead: false
         }));
         this.isLoading = false;
         this.shouldScroll = true;
-        console.log('Messages loaded and mapped:', this.messages);
+        this.error = '';
         this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Error loading messages:', error);
         this.isLoading = false;
-        // Show fallback message if backend fails
-        this.messages = [
-          {
-            id: 1,
-            senderId: this.OTHER_USER_ID,
-            recipientId: this.CURRENT_USER_ID,
-            text: 'Nu au fost găsite mesaje. Conectează backend-ul!',
-            timestamp: new Date(),
-            isRead: true
-          }
-        ];
+        this.error = 'Failed to load messages';
         this.cdr.markForCheck();
       }
     });
@@ -101,43 +150,20 @@ export class InboxComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  loadContacts(): void {
-    // Single mock contact - Dorel
-    this.contacts = [
-      {
-        id: 2,
-        firstName: 'Dorel',
-        lastName: 'Asd',
-        email: 'email2@email.com',
-        isOnline: true,
-        unreadCount: 0,
-        lastMessage: undefined
-      }
-    ];
-  }
-
-  loadMockContacts(): void {
-    this.loadContacts();
-  }
-
-  loadConversation(contact: Contact): void {
-    // Load messages from backend when contact is selected
+  selectContact(contact: Contact): void {
+    this.selectedContact = contact;
+    this.error = '';
     this.loadMessagesFromBackend();
   }
 
-  selectContact(contact: Contact): void {
-    this.selectedContact = contact;
-    this.loadConversation(contact);
-  }
-
   sendMessage(): void {
-    if (!this.newMessage.trim() || !this.selectedContact) {
+    if (!this.newMessage.trim() || !this.selectedContact || !this.currentUserId) {
       return;
     }
 
     const addMessageRequest = {
       text: this.newMessage.trim(),
-      senderId: this.CURRENT_USER_ID,
+      senderId: this.currentUserId,
       recipientId: this.selectedContact.id
     };
 
@@ -145,16 +171,17 @@ export class InboxComponent implements OnInit, AfterViewChecked {
       next: (response) => {
         const message: Message = {
           id: response.id,
-          senderId: this.CURRENT_USER_ID,
+          senderId: this.currentUserId!,
           recipientId: this.selectedContact!.id,
           text: response.text,
-          timestamp: new Date(),
+          timestamp: response.timestamp ? new Date(response.timestamp) : new Date(),
           isRead: false
         };
 
         this.messages.push(message);
         this.newMessage = '';
         this.shouldScroll = true;
+        this.error = '';
         this.cdr.markForCheck();
 
         // Update contact's last message
@@ -166,19 +193,7 @@ export class InboxComponent implements OnInit, AfterViewChecked {
       },
       error: (error) => {
         console.error('Error sending message:', error);
-        // Fallback to local message
-        const message: Message = {
-          id: this.messages.length + 1,
-          senderId: this.CURRENT_USER_ID,
-          recipientId: this.selectedContact!.id,
-          text: this.newMessage.trim(),
-          timestamp: new Date(),
-          isRead: false
-        };
-
-        this.messages.push(message);
-        this.newMessage = '';
-        this.shouldScroll = true;
+        this.error = 'Failed to send message';
         this.cdr.markForCheck();
       }
     });
@@ -220,5 +235,9 @@ export class InboxComponent implements OnInit, AfterViewChecked {
 
   formatMessageTime(date: Date): string {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  isCurrentUserMessage(message: Message): boolean {
+    return message.senderId === this.currentUserId;
   }
 }

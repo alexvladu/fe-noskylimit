@@ -1,13 +1,33 @@
 <div class="card-container">
-<!-- LEFT BUTTON -->
-  <button class="swipe-btn left" (click)="swipe('left')">
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading && cards.length === 0" class="loading-state">
+    <p>Finding matches for you...</p>
+  </div>
+
+  <!-- LEFT BUTTON (Pass) -->
+  <button 
+    class="swipe-btn left" 
+    (click)="swipe('left')"
+    [disabled]="cards.length === 0 || isAnimating"
+    title="Pass (← arrow key)"
+  >
     ❌
   </button>
 
-  <!-- RIGHT BUTTON -->
-<button class="swipe-btn right" (click)="swipe('right')">
-  <img src="/heart.png" alt="Like" class="heart-icon">
-</button>
+  <!-- RIGHT BUTTON (Like) -->
+  <button 
+    class="swipe-btn right" 
+    (click)="swipe('right')"
+    [disabled]="cards.length === 0 || isAnimating"
+    title="Like (→ arrow key)"
+  >
+    <img src="/heart.png" alt="Like" class="heart-icon">
+  </button>
 
   <div class="card-stack">
     <div
@@ -24,10 +44,33 @@
         ' translateY(' + ((cards.length - 1 - i) * -10) + 'px)'
       "
     >
-      <img [src]="card.img" [alt]="card.name" />
+      <!-- Photo Carousel -->
+      <div class="card-image-container" *ngIf="card.photos && card.photos.length > 0">
+        <img 
+          [src]="getImageUrl(card.photos[0].imageUrl)" 
+          [alt]="card.firstName + ' ' + card.lastName"
+          class="card-image"
+          (error)="onImageError($event)"
+        />
+      </div>
 
+      <div *ngIf="!card.photos || card.photos.length === 0" class="no-photo">
+        <p>No photos</p>
+      </div>
+
+      <!-- Card Info -->
       <div class="card-info">
-        <h3>{{ card.name }}</h3>
+        <div class="card-header">
+          <h3>{{ card.firstName }} {{ card.lastName }}, {{ card.age }}</h3>
+          <div class="card-details">
+            <span *ngIf="card.height" class="detail-item">📏 {{ card.height }} cm</span>
+            <span *ngIf="card.location" class="detail-item">📍 {{ card.location }}</span>
+          </div>
+        </div>
+        
+        <div *ngIf="card.bio" class="card-bio">
+          {{ card.bio }}
+        </div>
       </div>
     </div>
   </div>

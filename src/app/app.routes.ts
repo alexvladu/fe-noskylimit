@@ -21,12 +21,12 @@ export const routes: Routes = [
   },
   {
     path: 'setup-profile',
-    component: SetupProfile,
-    canActivate: [GuestGuard]
+    component: SetupProfile
   },
   {
     path: '',
     component: MainLayoutComponent,
+    canActivate: [AuthGuard],
     children: [
       {
         path: 'home',
@@ -36,7 +36,7 @@ export const routes: Routes = [
       {
         path: 'inbox',
         component: InboxComponent,
-        // canActivate: [SomeGuard]
+        canActivate: [AuthGuard]
       },
       {
         path: '',

@@ -1,24 +1,41 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../../enviroment';
 import { LoginDto } from '../../interfaces/login-dto';
+
+interface LoginResponse {
+  token: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-
-  register(user: { name: string; email: string; password: string }): Observable<any> {
-    // Replace with actual HTTP request logic
-    return of({ success: true });
-  }
   private apiUrl = environment.baseUrl;
   private http = inject(HttpClient);
 
   login(loginDto: LoginDto): Observable<LoginResponse> {
-    console.log(loginDto);
     return this.http.post<LoginResponse>(`${this.apiUrl}api/login`, loginDto);
+  }
+
+  register(user: { name?: string; firstName?: string; lastName?: string; email: string; password: string }): Observable<LoginResponse> {
+    const nameParts = user.name ? user.name.split(' ') : [];
+    const firstName = user.firstName || nameParts[0] || '';
+    const lastName = user.lastName || nameParts.slice(1).join(' ') || '';
+    
+    const request = {
+      firstName,
+      lastName,
+      email: user.email,
+      password: user.password
+    };
+    
+    return this.http.post<LoginResponse>(`${this.apiUrl}api/auth/register`, request);
+  }
+
+  registerComplete(formData: FormData): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}api/users/register`, formData);
   }
 
   logout(): void {
@@ -37,3 +54,4 @@ export class AuthService {
     return !!this.getToken();
   }
 }
+

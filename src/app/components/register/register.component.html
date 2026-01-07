@@ -3,11 +3,52 @@
   <h2>Create Account</h2>
 
   <form (ngSubmit)="onRegister()">
-    <input type="text" name="name" [(ngModel)]="name" placeholder="Full Name" required />
-    <input type="email" name="email" [(ngModel)]="email" placeholder="Email" required />
-    <input type="password" name="password" [(ngModel)]="password" placeholder="Password" required />
+    <div class="form-row">
+      <input 
+        type="text" 
+        name="firstName" 
+        [(ngModel)]="firstName" 
+        placeholder="First Name" 
+        required />
+      <input 
+        type="text" 
+        name="lastName" 
+        [(ngModel)]="lastName" 
+        placeholder="Last Name" 
+        required />
+    </div>
 
-    <button type="submit" [disabled]="isLoading">{{ isLoading ? 'Creating...' : 'Register' }}</button>
+    <input 
+      type="text" 
+      name="username" 
+      [(ngModel)]="username" 
+      placeholder="Username" 
+      required />
+
+    <input 
+      type="email" 
+      name="email" 
+      [(ngModel)]="email" 
+      placeholder="Email" 
+      required />
+
+    <input 
+      type="password" 
+      name="password" 
+      [(ngModel)]="password" 
+      placeholder="Password" 
+      required />
+
+    <input 
+      type="password" 
+      name="confirmPassword" 
+      [(ngModel)]="confirmPassword" 
+      placeholder="Confirm Password" 
+      required />
+
+    <button type="submit" [disabled]="isLoading">
+      {{ isLoading ? 'Continue...' : 'Continue to Profile Setup' }}
+    </button>
   </form>
 
   <p>
@@ -15,5 +56,4 @@
     <a routerLink="/login">Log In</a>
   </p>
 
-  <p *ngIf="error" style="color:red;">{{ error }}</p>
-</div>
+  <p *ngIf="error" class="error-message">{{ error }}</p>

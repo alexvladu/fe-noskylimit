@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef, inject, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InboxService, MessageDto } from '../../services/inbox/inbox.service';
 import { MatchService, MatchDto } from '../../services/match/match.service';
@@ -34,12 +34,13 @@ export interface Contact extends User {
   templateUrl: './inbox.html',
   styleUrls: ['./inbox.scss']
 })
-export class InboxComponent implements OnInit, AfterViewChecked {
+export class InboxComponent implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild('messagesEnd') messagesEnd!: ElementRef;
 
   private inboxService = inject(InboxService);
   private matchService = inject(MatchService);
   private cdr = inject(ChangeDetectorRef);
+  private intervalId: any;
 
   currentUserId: number | null = null;
   contacts: Contact[] = [];
@@ -48,6 +49,7 @@ export class InboxComponent implements OnInit, AfterViewChecked {
   newMessage = '';
   private shouldScroll = false;
   isLoading = false;
+  private lastMessageId: number = 0;
   error = '';
 
   ngOnInit(): void {
@@ -115,6 +117,7 @@ export class InboxComponent implements OnInit, AfterViewChecked {
 
     this.isLoading = true;
     this.messages = [];
+    this.lastMessageId = 0; // Reset when loading all messages
     this.cdr.markForCheck();
 
     // Load messages between current user and selected contact
@@ -129,6 +132,12 @@ export class InboxComponent implements OnInit, AfterViewChecked {
           timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
           isRead: false
         }));
+
+        // Update last message ID
+        if (this.messages.length > 0) {
+          this.lastMessageId = Math.max(...this.messages.map(m => m.id));
+        }
+
         this.isLoading = false;
         this.shouldScroll = true;
         this.error = '';
@@ -143,6 +152,45 @@ export class InboxComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  updateMessages(): void {
+    if (!this.selectedContact || !this.currentUserId) return;
+
+    // Load messages between current user and selected contact
+    this.inboxService.getMessagesBetween2Users(this.currentUserId, this.selectedContact.id).subscribe({
+      next: (data) => {
+        const newMessages = data.map(msg => ({
+          id: msg.id,
+          senderId: msg.senderId,
+          recipientId: msg.recipientId,
+          text: msg.text,
+          timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+          isRead: false
+        }));
+
+        // Filter out messages that are already in the array
+        const existingIds = new Set(this.messages.map(m => m.id));
+        const messagesToAdd = newMessages.filter(msg => !existingIds.has(msg.id));
+
+        // Add new messages to the existing array
+        if (messagesToAdd.length > 0) {
+          this.messages.push(...messagesToAdd);
+
+          // Update last message ID
+          this.lastMessageId = Math.max(this.lastMessageId, ...messagesToAdd.map(m => m.id));
+
+          // Sort messages by timestamp to ensure correct order
+          this.messages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+          this.shouldScroll = true;
+          this.cdr.markForCheck();
+        }
+      },
+      error: (error) => {
+        console.error('Error updating messages:', error);
+      }
+    });
+  }
+
   ngAfterViewChecked(): void {
     if (this.shouldScroll) {
       this.scrollToBottom();
@@ -150,10 +198,28 @@ export class InboxComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  ngOnDestroy(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+  }
+
   selectContact(contact: Contact): void {
     this.selectedContact = contact;
     this.error = '';
     this.loadMessagesFromBackend();
+
+    // Clear any existing interval
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+
+    // Start refreshing messages every 500ms (twice per second)
+    this.intervalId = setInterval(() => {
+      if (this.selectedContact) {
+        this.updateMessages();
+      }
+    }, 500);
   }
 
   sendMessage(): void {
@@ -179,6 +245,7 @@ export class InboxComponent implements OnInit, AfterViewChecked {
         };
 
         this.messages.push(message);
+        this.lastMessageId = Math.max(this.lastMessageId, message.id); // Update last message ID
         this.newMessage = '';
         this.shouldScroll = true;
         this.error = '';

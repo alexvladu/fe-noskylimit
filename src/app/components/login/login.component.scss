@@ -14,6 +14,16 @@ $focus-ring: rgba(238, 9, 121, 0.4);
   min-height: 100vh;
   background: linear-gradient(135deg, $gradient-start, $gradient-end);
   font-family: $font-family;
+  padding: 1rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  :host {
+    padding: 1rem;
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
 }
 
 .auth-card {
@@ -25,6 +35,15 @@ $focus-ring: rgba(238, 9, 121, 0.4);
   max-width: 420px;
   text-align: center;
   animation: fadeIn 0.6s ease;
+}
+
+/* Mobile responsive auth card */
+@media (max-width: 768px) {
+  .auth-card {
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  }
 }
 
 .logo {
@@ -58,6 +77,15 @@ input {
   }
 }
 
+/* Mobile responsive inputs */
+@media (max-width: 768px) {
+  input {
+    padding: 0.875rem 1rem;
+    font-size: 16px; /* Prevent zoom on iOS */
+    border-radius: 0.75rem;
+  }
+}
+
 button {
   background: linear-gradient(to right, $gradient-start, $gradient-end);
   color: #fff;
@@ -72,6 +100,23 @@ button {
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(238, 9, 121, 0.35);
+  }
+}
+
+/* Mobile responsive button */
+@media (max-width: 768px) {
+  button {
+    padding: 1rem;
+    font-size: 16px; /* Prevent zoom on iOS */
+    border-radius: 0.75rem;
+
+    &:hover {
+      transform: none; /* Disable hover transform on touch devices */
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
   }
 }
 

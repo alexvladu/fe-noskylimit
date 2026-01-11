@@ -6,6 +6,15 @@
   color: #fff;
 }
 
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .chat-wrapper {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+}
+
 /* ---------------- Sidebar ---------------- */
 .contacts-sidebar {
   width: 320px;
@@ -30,6 +39,28 @@
   .contacts-list {
     flex: 1;
     overflow-y: auto;
+  }
+}
+
+/* Mobile responsive sidebar */
+@media (max-width: 768px) {
+  .contacts-sidebar {
+    width: 100%;
+    max-height: 40vh; /* Limit height on mobile */
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+
+    .sidebar-header {
+      padding: 16px;
+
+      h1 {
+        font-size: 18px;
+      }
+    }
+
+    .contacts-list {
+      max-height: calc(40vh - 80px);
+    }
   }
 }
 
@@ -105,6 +136,31 @@
   }
 }
 
+/* Mobile responsive contact cards */
+@media (max-width: 768px) {
+  .contact-card {
+    padding: 16px 20px;
+    margin: 8px 12px;
+    gap: 16px;
+
+    .contact-avatar {
+      width: 50px;
+      height: 50px;
+      flex-shrink: 0;
+    }
+
+    .contact-info {
+      .contact-name {
+        font-size: 16px;
+      }
+
+      .last-message {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
 /* ---------------- Chat Area ---------------- */
 .chat-area {
   flex: 1;
@@ -112,6 +168,14 @@
   flex-direction: column;
   background: rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(14px);
+}
+
+/* Mobile responsive chat area */
+@media (max-width: 768px) {
+  .chat-area {
+    flex: 1;
+    min-height: 60vh;
+  }
 }
 
 /* Chat Header */
@@ -176,6 +240,14 @@
   gap: 14px;
 }
 
+/* Mobile responsive messages */
+@media (max-width: 768px) {
+  .messages-area {
+    padding: 16px;
+    gap: 12px;
+  }
+}
+
 .message-bubble {
   max-width: 65%;
   padding: 12px 16px;
@@ -198,6 +270,19 @@
     font-size: 11px;
     opacity: 0.8;
     margin-top: 4px;
+  }
+}
+
+/* Mobile responsive message bubbles */
+@media (max-width: 768px) {
+  .message-bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    font-size: 16px; /* Prevent zoom on iOS */
+
+    .message-time {
+      font-size: 10px;
+    }
   }
 }
 
@@ -245,6 +330,31 @@
     svg {
       width: 22px;
       height: 22px;
+    }
+  }
+}
+
+/* Mobile responsive input area */
+@media (max-width: 768px) {
+  .message-input-area {
+    padding: 12px 16px;
+    gap: 12px;
+
+    .message-input {
+      padding: 14px 18px;
+      font-size: 16px; /* Prevent zoom on iOS */
+      border-radius: 28px;
+    }
+
+    .send-button {
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+
+      svg {
+        width: 24px;
+        height: 24px;
+      }
     }
   }
 }

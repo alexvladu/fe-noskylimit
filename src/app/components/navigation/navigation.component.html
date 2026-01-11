@@ -1,21 +1,29 @@
-<nav>
+<!-- Mobile menu button -->
+<button class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+  <fa-icon [icon]="mobileMenuOpen() ? faTimes : faBars"></fa-icon>
+</button>
+
+<nav [class.mobile-open]="mobileMenuOpen()">
   <ul>
     <li class="logo">
-      <a routerLink="/home"><img src="/Logo.png" alt="Home"></a>
+      <a routerLink="/home" (click)="closeMobileMenu()"><img src="/Logo.png" alt="Home"></a>
     </li>
-    <li><a routerLink="/inbox"><fa-icon [icon]="faEnvelope"></fa-icon> <span>Inbox</span></a></li>
+    <li><a routerLink="/inbox" (click)="closeMobileMenu()"><fa-icon [icon]="faEnvelope"></fa-icon> <span>Inbox</span></a></li>
   </ul>
 
   <div class="bottom-nav">
-    <a (click)="openSettings()" class="settings-link">
+    <a (click)="openSettings(); closeMobileMenu()" class="settings-link">
       <fa-icon [icon]="faCog"></fa-icon> <span>Settings</span>
     </a>
     <hr class="separator">
-    <a routerLink="/profile">
+    <a routerLink="/profile" (click)="closeMobileMenu()">
       <fa-icon [icon]="faUserCircle"></fa-icon> <span>Profile</span>
     </a>
   </div>
 </nav>
+
+<!-- Mobile overlay -->
+<div class="mobile-overlay" [class.active]="mobileMenuOpen()" (click)="closeMobileMenu()"></div>
 
 <!-- Settings Modal -->
 <app-settings-modal *ngIf="showSettings()" (close)="closeSettings()" (logout)="onLogout()">

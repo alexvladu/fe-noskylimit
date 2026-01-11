@@ -11,6 +11,16 @@
   @include orange-gradient;
 }
 
+/* Mobile responsive */
+@media (max-width: 768px) {
+  :host {
+    height: auto;
+    min-height: 100vh;
+    padding: 20px 0;
+    overflow: visible;
+  }
+}
+
 .card-container {
   display: flex;
   justify-content: center;
@@ -23,6 +33,15 @@
   position: relative;
   width: 420px;
   height: 650px;
+}
+
+/* Mobile responsive card stack */
+@media (max-width: 768px) {
+  .card-stack {
+    width: 90vw;
+    max-width: 350px;
+    height: 550px;
+  }
 }
 
 .card {
@@ -48,6 +67,24 @@
       0 10px 25px rgba(0, 0, 0, 0.25),
       0 0 0 1px rgba(255, 255, 255, 0.15),
       0 0 50px rgba(255, 107, 53, 0.2);
+  }
+}
+
+/* Mobile responsive cards */
+@media (max-width: 768px) {
+  .card {
+    width: 90vw;
+    max-width: 350px;
+    height: 550px;
+    border-radius: var(--radius-md);
+
+    &:hover {
+      box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.3),
+        0 5px 15px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 0 30px rgba(255, 107, 53, 0.15);
+    }
   }
 }
 

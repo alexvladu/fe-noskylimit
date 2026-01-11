@@ -1,8 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService, UserDto } from '../../services/user/user.service';
+import { AuthService } from '../../services/auth/auth.service';
+import { timeout, catchError } from 'rxjs/operators';
+import { throwError, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -11,9 +14,12 @@ import { UserService, UserDto } from '../../services/user/user.service';
   templateUrl: './profile.html',
   styleUrls: ['./profile.scss']
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
+  private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+  private subscription?: Subscription;
 
   user: UserDto | null = null;
   isLoading = false;
@@ -60,24 +66,76 @@ export class ProfileComponent implements OnInit {
   };
 
   ngOnInit(): void {
+    console.log('Profile component initialized');
     this.loadUserProfile();
   }
 
-  loadUserProfile(): void {
-    this.error = '';
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      console.log('Unsubscribing from profile loading');
+      this.subscription.unsubscribe();
+    }
+  }
 
-    this.userService.getCurrentUser().subscribe({
+  loadUserProfile(): void {
+    // Cancel any existing request
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+
+    console.log('Starting to load user profile...');
+
+    // Check authentication
+    const token = this.authService.getToken();
+    console.log('Auth token exists:', !!token);
+    if (!token) {
+      console.error('No auth token found');
+      this.error = 'You are not authenticated. Please log in again.';
+      this.isLoading = false;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    console.log('Current user service:', this.userService);
+    this.isLoading = true;
+    this.error = '';
+    this.cdr.detectChanges(); // Force change detection
+
+    console.log('Making API call to getCurrentUser...');
+    this.subscription = this.userService.getCurrentUser().pipe(
+      timeout(10000), // 10 second timeout
+      catchError(err => {
+        if (err.name === 'TimeoutError') {
+          console.error('Request timed out after 10 seconds');
+          this.error = 'Request timed out. Please check your connection.';
+          this.isLoading = false;
+          this.cdr.detectChanges();
+          return throwError(() => new Error('Request timeout'));
+        }
+        return throwError(() => err);
+      })
+    ).subscribe({
       next: (user: UserDto) => {
+        console.log('Profile loaded successfully:', user);
         this.user = user;
         this.resetEditData();
         this.isLoading = false;
+        this.cdr.detectChanges(); // Force change detection
       },
       error: (err) => {
         console.error('Error loading profile:', err);
-        this.error = 'Failed to load profile. Please try again.';
+        if (!this.error) { // Only set error if not already set by timeout
+          this.error = 'Failed to load profile. Please try again.';
+        }
         this.isLoading = false;
+        this.cdr.detectChanges(); // Force change detection
+      },
+      complete: () => {
+        console.log('Profile loading observable completed');
       }
     });
+
+    console.log('Subscription created:', this.subscription);
   }
 
   resetEditData(): void {

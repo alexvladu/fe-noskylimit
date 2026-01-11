@@ -1,10 +1,27 @@
-<div class="profile-container" *ngIf="!isLoading">
+<!-- Loading State -->
+<div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading your profile...</p>
+        <button class="retry-btn" (click)="loadUserProfile()">Retry</button>
+    </div>
+</div>
+
+<!-- Error State -->
+<div class="error-container" *ngIf="!isLoading && error">
+    <div class="error-message">
+        <h2>Oops! Something went wrong</h2>
+        <p>{{ error }}</p>
+        <button class="retry-btn" (click)="loadUserProfile()">Try Again</button>
+    </div>
+</div>
+
+<!-- Profile Content -->
+<div class="profile-container" *ngIf="!isLoading && !error && user">
     <div class="profile-header">
         <h1>My Profile</h1>
         <button class="logout-btn" (click)="logout()">Logout</button>
     </div>
-
-    <div class="error-message" *ngIf="error">{{ error }}</div>
 
     <div class="profile-content" *ngIf="user">
         <!-- VIEW MODE -->

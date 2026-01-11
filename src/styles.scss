@@ -7,3 +7,30 @@ html, body {
   background: linear-gradient(135deg, #ff8c00, #ff416c);
   overflow: hidden;
 }
+
+/* Mobile-first responsive design */
+* {
+  box-sizing: border-box;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  html, body {
+    overflow: auto; /* Allow scrolling on mobile */
+  }
+
+  /* Hide scrollbars on mobile for cleaner look */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Adjust for tablets */
+}
+
+/* Desktop styles */
+@media (min-width: 1025px) {
+  /* Desktop specific styles */
+}

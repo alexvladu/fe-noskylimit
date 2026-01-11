@@ -1,0 +1,53 @@
+<div class="match-overlay" @fadeIn>
+    <div class="confetti-container">
+        <div class="confetti" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]"></div>
+    </div>
+
+    <div class="match-content" @slideIn>
+        <h1 class="match-title">It's a Match!</h1>
+        <p class="match-subtitle">You and {{ matchedUser?.firstName }} liked each other</p>
+
+        <div class="photos-container">
+            <div class="photo-wrapper left">
+                <div class="photo-frame">
+                    <img [src]="getImageUrl(currentUserPhoto)" alt="You" class="match-photo">
+                </div>
+            </div>
+
+            <div class="heart-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                        fill="currentColor" />
+                </svg>
+            </div>
+
+            <div class="photo-wrapper right">
+                <div class="photo-frame">
+                    <img [src]="getImageUrl(matchedUser?.photo || '')" [alt]="matchedUser?.firstName"
+                        class="match-photo">
+                </div>
+            </div>
+        </div>
+
+        <div class="match-actions">
+            <button class="btn btn-secondary" (click)="onKeepSwiping()">
+                Keep Swiping
+            </button>
+            <button class="btn btn-primary" (click)="onSendMessage()">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 4L3 11l7 3 4-4-3 4 3 7z" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+                Send Message
+            </button>
+        </div>
+    </div>
+
+    <button class="close-btn" (click)="onClose()" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+    </button>
+</div>

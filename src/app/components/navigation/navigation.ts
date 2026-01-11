@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faEnvelope, faCog, faHeart, faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faCog, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { CommonModule } from '@angular/common';
 import { SettingsModalComponent } from './settings-modal/settings-modal';
 
@@ -20,7 +20,6 @@ import { SettingsModalComponent } from './settings-modal/settings-modal';
 export class NavigationComponent {
   faEnvelope = faEnvelope;
   faCog = faCog;
-  faHeart = faHeart;
   faUserCircle = faUserCircle;
 
   showSettings = signal(false);
@@ -43,5 +42,5 @@ export class NavigationComponent {
     this.router.navigate(['/login']);
   }
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 }

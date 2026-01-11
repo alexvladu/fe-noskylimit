@@ -6,8 +6,7 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  width: calc(100vw - 100px);
-  margin-left: 100px;
+  width: 100vw;
   overflow: hidden;
   @include orange-gradient;
 }
@@ -33,10 +32,23 @@
   overflow: hidden;
   position: absolute;
   border: none;
-  box-shadow: var(--shadow-lg);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 8px 20px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 40px rgba(255, 107, 53, 0.15);
   background: var(--white);
   display: flex;
   flex-direction: column;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow:
+      0 25px 70px rgba(0, 0, 0, 0.35),
+      0 10px 25px rgba(0, 0, 0, 0.25),
+      0 0 0 1px rgba(255, 255, 255, 0.15),
+      0 0 50px rgba(255, 107, 53, 0.2);
+  }
 }
 
 .card:active {
@@ -113,64 +125,93 @@
 }
 
 .card-info {
-  padding: var(--spacing-md);
-  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  padding: 24px 20px 20px;
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.35) 30%,
+    rgba(0, 0, 0, 0.15) 60%,
+    transparent 100%
+  );
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   color: var(--white);
+  backdrop-filter: blur(10px);
 }
 
 .card-header {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
-  margin-bottom: var(--spacing-xs);
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
-.card-info h3 {
+.card-name {
   margin: 0;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--white);
   line-height: 1.2;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.5px;
+}
+
+.card-age {
+  font-weight: 400;
+  opacity: 0.95;
 }
 
 .card-details {
   display: flex;
-  gap: var(--spacing-xs);
+  gap: 8px;
   flex-wrap: wrap;
   align-items: center;
 }
 
-.detail-item {
-  font-size: 12px;
+.detail-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
   color: var(--white);
-  background: rgba(255, 107, 53, 0.8);
-  padding: 5px 12px;
-  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.18);
+  padding: 6px 12px;
+  border-radius: 20px;
   white-space: nowrap;
-  font-weight: 600;
-  backdrop-filter: blur(4px);
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
 }
 
-.location {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.9);
+.detail-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--white);
+  flex-shrink: 0;
 }
 
 .card-bio {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.95);
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.6;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   font-weight: 400;
-  margin-top: var(--spacing-xs);
+  margin-top: 8px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.2px;
 }
 
 .swipe-btn {
@@ -237,17 +278,24 @@
 
 .error-message {
   position: absolute;
-  top: 20px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 100, 100, 0.9);
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
   color: var(--white);
-  padding: var(--spacing-sm);
-  border-radius: var(--radius-md);
+  padding: 2.5rem 3rem;
+  border-radius: var(--radius-lg);
   z-index: 100;
-  font-size: 14px;
-  max-width: 300px;
+  font-size: 20px;
+  font-weight: 600;
   text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  p {
+    margin: 0;
+  }
 }
 
 .swipe-btn:disabled {

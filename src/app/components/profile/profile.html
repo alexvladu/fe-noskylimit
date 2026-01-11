@@ -7,86 +7,250 @@
     <div class="error-message" *ngIf="error">{{ error }}</div>
 
     <div class="profile-content" *ngIf="user">
-        <!-- Photos Section -->
-        <div class="photos-section">
-            <h2>Photos</h2>
-            <div class="photos-grid">
-                <div class="photo-item" *ngFor="let photo of user.photos">
-                    <img [src]="getImageUrl(photo)" alt="Profile photo" />
-                </div>
-                <div class="no-photos" *ngIf="!user.photos || user.photos.length === 0">
-
-                    <!-- Basic Info Section -->
-                    <div class="info-section">
-                        <div class="section-header">
-                            <h2>Basic Information</h2>
-                            <button class="edit-btn" (click)="toggleEdit()">
-                                {{ isEditing ? 'Cancel' : 'Edit Profile' }}
-                            </button>
-                        </div>
-
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <label>Name:</label>
-                                <span>{{ user.firstName }} {{ user.lastName }}</span>
-                            </div>
-
-                            <div class="info-item">
-                                <label>Email:</label>
-                                <span>{{ user.email }}</span>
-                            </div>
-
-                            <div class="info-item">
-                                <label>Age:</label>
-                                <span *ngIf="!isEditing">{{ user.age || 'Not set' }}</span>
-                                <input *ngIf="isEditing" type="number" [(ngModel)]="editData.age" />
-                            </div>
-
-                            <div class="info-item">
-                                <label>Height:</label>
-                                <span *ngIf="!isEditing">{{ user.height ? user.height + ' cm' : 'Not set' }}</span>
-                                <input *ngIf="isEditing" type="number" [(ngModel)]="editData.height" />
-                            </div>
-
-                            <div class="info-item">
-                                <label>Gender:</label>
-                                <span>{{ getGenderLabel(user.gender) }}</span>
-                            </div>
-
-                            <div class="info-item">
-                                <label>Location:</label>
-                                <span *ngIf="!isEditing">{{ user.city || 'Not set' }}</span>
-                                <input *ngIf="isEditing" type="text" [(ngModel)]="editData.city" />
-                            </div>
-
-                            <div class="info-item full-width">
-                                <label>Bio:</label>
-                                <span *ngIf="!isEditing">{{ user.bio || 'No bio yet' }}</span>
-                                <textarea *ngIf="isEditing" [(ngModel)]="editData.bio" rows="4"></textarea>
-                            </div>
-
-                            <div class="info-item">
-                                <label>Sexual Orientation:</label>
-                                <span>{{ getOrientationLabel(user.sexualOrientation) }}</span>
-                            </div>
-
-                            <div class="info-item">
-                                <label>Relationship Goal:</label>
-                                <span>{{ getRelationshipGoalLabel(user.relationshipGoal) }}</span>
-                            </div>
-
-                            <div class="info-item">
-                                <label>Age Preference:</label>
-                                <span>{{ user.preferredAgeMin || 18 }} - {{ user.preferredAgeMax || 50 }}</span>
-                            </div>
-                        </div>
-
-                        <button *ngIf="isEditing" class="save-btn" (click)="saveProfile()">Save Changes</button>
+        <!-- VIEW MODE -->
+        <ng-container *ngIf="!isEditing">
+            <!-- Photos Section -->
+            <div class="photos-section">
+                <h2>Photos</h2>
+                <div class="photos-grid">
+                    <div class="photo-item" *ngFor="let photo of user.photos">
+                        <img [src]="getImageUrl(photo)" alt="Profile photo" />
+                    </div>
+                    <div class="no-photos" *ngIf="!user.photos || user.photos.length === 0">
+                        No photos uploaded yet
                     </div>
                 </div>
             </div>
 
-            <div class="loading" *ngIf="isLoading">
-                <div class="spinner"></div>
-                <p>Loading profile...</p>
+            <!-- Basic Info Section -->
+            <div class="info-section">
+                <div class="section-header">
+                    <h2>Basic Information</h2>
+                    <button class="edit-btn" (click)="toggleEdit()">Edit Profile</button>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Name:</label>
+                        <span>{{ user.firstName }} {{ user.lastName }}</span>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Email:</label>
+                        <span>{{ user.email }}</span>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Age:</label>
+                        <span>{{ user.age || 'Not set' }}</span>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Height:</label>
+                        <span>{{ user.height ? user.height + ' cm' : 'Not set' }}</span>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Gender:</label>
+                        <span>{{ getGenderLabel(user.gender) }}</span>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Location:</label>
+                        <span>{{ user.city || 'Not set' }}</span>
+                    </div>
+
+                    <div class="info-item full-width">
+                        <label>Bio:</label>
+                        <span>{{ user.bio || 'No bio yet' }}</span>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Sexual Orientation:</label>
+                        <span>{{ getOrientationLabel(user.sexualOrientation) }}</span>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Relationship Goal:</label>
+                        <span>{{ getRelationshipGoalLabel(user.relationshipGoal) }}</span>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Age Preference:</label>
+                        <span>{{ user.preferredAgeMin || 18 }} - {{ user.preferredAgeMax || 50 }}</span>
+                    </div>
+
+                    <div class="info-item full-width">
+                        <label>Languages:</label>
+                        <div class="tags-display">
+                            <span class="tag" *ngFor="let lang of user.languages">
+                                {{ getLanguageLabel(lang) }}
+                            </span>
+                            <span *ngIf="!user.languages || user.languages.length === 0">Not set</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item full-width">
+                        <label>Interests:</label>
+                        <div class="tags-display">
+                            <span class="tag" *ngFor="let interest of user.interests">
+                                {{ getInterestLabel(interest) }}
+                            </span>
+                            <span *ngIf="!user.interests || user.interests.length === 0">Not set</span>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </ng-container>
+
+        <!-- EDIT MODE -->
+        <ng-container *ngIf="isEditing">
+            <div class="edit-form">
+                <div class="section-header">
+                    <h2>Edit Profile</h2>
+                    <button class="cancel-btn" (click)="toggleEdit()">Cancel</button>
+                </div>
+
+                <!-- Photos Section -->
+                <div class="form-section">
+                    <h3>Photos (2-6 required)</h3>
+                    <div class="photos-edit-grid">
+                        <!-- Existing Photos -->
+                        <div class="photo-edit-item" *ngFor="let photo of editData.existingPhotos; let i = index"
+                            [class.marked-delete]="isPhotoMarkedForDeletion(i)">
+                            <img [src]="getImageUrl(photo)" alt="Profile photo" />
+                            <button type="button" class="delete-photo-btn"
+                                (click)="isPhotoMarkedForDeletion(i) ? undoPhotoDelete(i) : removeExistingPhoto(i)">
+                                {{ isPhotoMarkedForDeletion(i) ? '↶' : '×' }}
+                            </button>
+                        </div>
+
+                        <!-- New Photos Preview -->
+                        <div class="photo-edit-item" *ngFor="let preview of editData.photoPreviews; let i = index">
+                            <img [src]="preview" alt="New photo" />
+                            <button type="button" class="delete-photo-btn" (click)="removeNewPhoto(i)">×</button>
+                            <span class="new-badge">NEW</span>
+                        </div>
+
+                        <!-- Add Photo Button -->
+                        <div class="photo-upload-btn"
+                            *ngIf="(editData.existingPhotos.length - editData.photosToDelete.length + editData.photos.length) < 6">
+                            <input type="file" accept="image/*" (change)="onFileSelected($event)" #fileInput
+                                style="display: none">
+                            <button type="button" (click)="fileInput.click()">
+                                <span>+</span>
+                                <small>Add Photo</small>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Information -->
+                <div class="form-section">
+                    <h3>Basic Information</h3>
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label>Age *</label>
+                            <input type="number" [(ngModel)]="editData.age" min="18" max="100" required>
+                        </div>
+
+                        <div class="form-field">
+                            <label>Height (cm) *</label>
+                            <input type="number" [(ngModel)]="editData.height" min="100" max="250" required>
+                        </div>
+
+                        <div class="form-field">
+                            <label>Gender *</label>
+                            <select [(ngModel)]="editData.gender" required>
+                                <option [value]="0">Male</option>
+                                <option [value]="1">Female</option>
+                                <option [value]="2">Non-binary</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label>Location *</label>
+                            <input type="text" [(ngModel)]="editData.city" required>
+                        </div>
+
+                        <div class="form-field full-width">
+                            <label>Bio *</label>
+                            <textarea [(ngModel)]="editData.bio" rows="4" maxlength="500" required></textarea>
+                            <small>{{ editData.bio.length }}/500 characters</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Languages -->
+                <div class="form-section">
+                    <h3>Languages (At least 1 required)</h3>
+                    <div class="tags-selector">
+                        <button type="button" class="tag-btn" *ngFor="let lang of availableLanguages; let i = index"
+                            [class.selected]="isLanguageSelected(i)" [class.locked]="isLanguageDisabled(i)"
+                            [disabled]="isLanguageDisabled(i)" (click)="toggleLanguage(i)">
+                            {{ lang }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Interests -->
+                <div class="form-section">
+                    <h3>Interests (1-5 required)</h3>
+                    <div class="tags-selector">
+                        <button type="button" class="tag-btn" *ngFor="let hobby of availableHobbies; let i = index"
+                            [class.selected]="isInterestSelected(i)" [class.locked]="isInterestDisabled(i)"
+                            [disabled]="isInterestDisabled(i)" (click)="toggleInterest(i)">
+                            {{ hobby }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Preferences -->
+                <div class="form-section">
+                    <h3>Preferences</h3>
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label>Sexual Orientation *</label>
+                            <select [(ngModel)]="editData.sexualOrientation" required>
+                                <option [value]="0">Straight</option>
+                                <option [value]="1">Gay</option>
+                                <option [value]="2">Lesbian</option>
+                                <option [value]="3">Bisexual</option>
+                                <option [value]="4">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label>Relationship Goal *</label>
+                            <select [(ngModel)]="editData.relationshipGoal" required>
+                                <option [value]="0">Casual</option>
+                                <option [value]="1">Serious Relationship</option>
+                                <option [value]="2">Marriage</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label>Min Age Preference *</label>
+                            <input type="number" [(ngModel)]="editData.preferredAgeMin" min="18" max="100" required>
+                        </div>
+
+                        <div class="form-field">
+                            <label>Max Age Preference *</label>
+                            <input type="number" [(ngModel)]="editData.preferredAgeMax" min="18" max="120" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <button class="save-btn" (click)="saveProfile()" [disabled]="isSaving">
+                    {{ isSaving ? 'Saving...' : 'Save Changes' }}
+                </button>
+            </div>
+        </ng-container>
+    </div>
+</div>
+
+<div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading profile...</p>
+</div>

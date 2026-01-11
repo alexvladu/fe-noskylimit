@@ -1,9 +1,4 @@
 <div class="chat-wrapper">
-  <!-- Error Alert -->
-  <div *ngIf="error" class="error-banner">
-    {{ error }}
-  </div>
-
   <!-- Contacts Sidebar -->
   <div class="contacts-sidebar">
     <div class="sidebar-header">
@@ -20,19 +15,11 @@
         <p>Loading your matches...</p>
       </div>
 
-      <div
-        *ngFor="let contact of contacts"
-        class="contact-card"
-        [class.active]="selectedContact?.id === contact.id"
-        [class.unread]="contact.unreadCount > 0"
-        (click)="selectContact(contact)"
-      >
+      <div *ngFor="let contact of contacts" class="contact-card" [class.active]="selectedContact?.id === contact.id"
+        [class.unread]="contact.unreadCount > 0" (click)="selectContact(contact)">
         <div class="contact-avatar">
-          <img
-            *ngIf="contact.profilePhoto"
-            [src]="contact.profilePhoto"
-            [alt]="contact.firstName + ' ' + contact.lastName"
-          />
+          <img *ngIf="contact.profilePhoto" [src]="getImageUrl(contact.profilePhoto)"
+            [alt]="contact.firstName + ' ' + contact.lastName" />
           <span *ngIf="!contact.profilePhoto">
             {{ getInitials(contact.firstName, contact.lastName) }}
           </span>
@@ -49,8 +36,8 @@
             </span>
           </div>
           <div class="contact-bottom">
-            <span class="last-message">
-              {{ contact.lastMessage?.text || 'No messages yet' }}
+            <span class="last-message" *ngIf="contact.lastMessage">
+              {{ contact.lastMessage.text }}
             </span>
             <span *ngIf="contact.unreadCount > 0" class="unread-badge">
               {{ contact.unreadCount }}
@@ -68,11 +55,8 @@
       <div class="chat-header">
         <div class="chat-header-left">
           <div class="contact-avatar-large">
-            <img
-              *ngIf="selectedContact.profilePhoto"
-              [src]="selectedContact.profilePhoto"
-              [alt]="selectedContact.firstName + ' ' + selectedContact.lastName"
-            />
+            <img *ngIf="selectedContact.profilePhoto" [src]="getImageUrl(selectedContact.profilePhoto)"
+              [alt]="selectedContact.firstName + ' ' + selectedContact.lastName" />
             <span *ngIf="!selectedContact.profilePhoto">
               {{ getInitials(selectedContact.firstName, selectedContact.lastName) }}
             </span>
@@ -90,17 +74,13 @@
         <div *ngIf="isLoading" class="loading-spinner">
           Loading messages...
         </div>
-        
-        <div
-          *ngFor="let message of messages"
-          class="message-bubble"
-          [class.sent]="isCurrentUserMessage(message)"
-          [class.received]="!isCurrentUserMessage(message)"
-        >
+
+        <div *ngFor="let message of messages" class="message-bubble" [class.sent]="isCurrentUserMessage(message)"
+          [class.received]="!isCurrentUserMessage(message)">
           <div class="message-text">{{ message.text }}</div>
           <div class="message-time">{{ formatMessageTime(message.timestamp) }}</div>
         </div>
-        
+
         <div *ngIf="messages.length === 0 && !isLoading" class="no-messages">
           No messages yet. Start a conversation!
         </div>
@@ -110,28 +90,12 @@
 
       <!-- Message Input -->
       <div class="message-input-area">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          [(ngModel)]="newMessage"
-          (keypress)="onKeyPress($event)"
-          class="message-input"
-          [disabled]="isLoading"
-        />
-        <button
-          type="button"
-          class="send-button"
-          [disabled]="!newMessage.trim() || isLoading"
-          (click)="sendMessage()"
-        >
+        <input type="text" placeholder="Type a message..." [(ngModel)]="newMessage" (keypress)="onKeyPress($event)"
+          class="message-input" [disabled]="isLoading" />
+        <button type="button" class="send-button" [disabled]="!newMessage.trim() || isLoading" (click)="sendMessage()">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </button>
       </div>

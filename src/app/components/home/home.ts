@@ -3,6 +3,8 @@ import { PingService } from '../../services/ping/ping.service';
 import { MatchService, RandomUserDto } from '../../services/match/match.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatchModalComponent } from '../match-modal/match-modal.component';
+import { UserService } from '../../services/user/user.service';
 
 export interface Card {
   id: number;
@@ -18,7 +20,7 @@ export interface Card {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatchModalComponent],
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
 })
@@ -26,6 +28,7 @@ export class HomeComponent implements OnInit {
 
   private pingService = inject(PingService);
   private matchService = inject(MatchService);
+  private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
 
   cards: Card[] = [];
@@ -34,6 +37,11 @@ export class HomeComponent implements OnInit {
   isLoading = true;
   error = '';
 
+  // Match modal state
+  showMatchModal = false;
+  matchedUser: { id: number; firstName: string; lastName: string; photo: string } | null = null;
+  currentUserPhoto: string = '';
+
   ngOnInit(): void {
     this.pingService.ping().subscribe({
       next: (value: string) => {
@@ -41,6 +49,18 @@ export class HomeComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Ping error:', err);
+      }
+    });
+
+    // Load current user photo for match modal
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        if (user.photos && user.photos.length > 0) {
+          this.currentUserPhoto = user.photos[0];
+        }
+      },
+      error: (err) => {
+        console.error('Error loading current user:', err);
       }
     });
 
@@ -115,7 +135,17 @@ export class HomeComponent implements OnInit {
             console.log('Match created:', response);
             if (response.isMutual) {
               console.log('Mutual match!');
-              // TODO: Show mutual match notification
+              // Show match modal
+              this.matchedUser = {
+                id: currentCard.id,
+                firstName: currentCard.firstName,
+                lastName: currentCard.lastName,
+                photo: currentCard.photos && currentCard.photos.length > 0
+                  ? currentCard.photos[0].imageUrl
+                  : ''
+              };
+              this.showMatchModal = true;
+              this.cdr.markForCheck();
             }
             // Load next user after successful like
             this.finishSwipe();
@@ -161,5 +191,16 @@ export class HomeComponent implements OnInit {
     } else if (event.key === 'ArrowRight') {
       this.swipe('right');
     }
+  }
+
+  closeMatchModal() {
+    this.showMatchModal = false;
+    this.matchedUser = null;
+    this.cdr.markForCheck();
+  }
+
+  handleSendMessage(userId: number) {
+    // Modal component will handle navigation to inbox
+    this.closeMatchModal();
   }
 }

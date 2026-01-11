@@ -4,7 +4,6 @@
       <a routerLink="/home"><img src="/Logo.png" alt="Home"></a>
     </li>
     <li><a routerLink="/inbox"><fa-icon [icon]="faEnvelope"></fa-icon> <span>Inbox</span></a></li>
-    <li><a routerLink="/likes"><fa-icon [icon]="faHeart"></fa-icon> <span>Likes</span></a></li>
   </ul>
 
   <div class="bottom-nav">
@@ -19,8 +18,5 @@
 </nav>
 
 <!-- Settings Modal -->
-<app-settings-modal
-  *ngIf="showSettings()"
-  (close)="closeSettings()"
-  (logout)="onLogout()">
+<app-settings-modal *ngIf="showSettings()" (close)="closeSettings()" (logout)="onLogout()">
 </app-settings-modal>

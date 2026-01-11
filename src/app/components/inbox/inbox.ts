@@ -73,7 +73,7 @@ export class InboxComponent implements OnInit, AfterViewChecked {
     this.matchService.getCurrentUserMutualMatches().subscribe({
       next: (matches: MatchDto[]) => {
         console.log('Mutual matches loaded:', matches);
-        
+
         if (matches.length === 0) {
           this.contacts = [];
           this.isLoading = false;
@@ -116,7 +116,7 @@ export class InboxComponent implements OnInit, AfterViewChecked {
     this.isLoading = true;
     this.messages = [];
     this.cdr.markForCheck();
-    
+
     // Load messages between current user and selected contact
     this.inboxService.getMessagesBetween2Users(this.currentUserId, this.selectedContact.id).subscribe({
       next: (data) => {
@@ -216,6 +216,16 @@ export class InboxComponent implements OnInit, AfterViewChecked {
 
   getInitials(firstName: string, lastName: string): string {
     return `${firstName[0]}${lastName[0]}`.toUpperCase();
+  }
+
+  getImageUrl(imageUrl?: string): string {
+    if (!imageUrl) return '';
+    // If it's already a data URL or a full URL, return as is
+    if (imageUrl.startsWith('data:') || imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+    // Otherwise, assume it's base64 and add the prefix
+    return `data:image/jpeg;base64,${imageUrl}`;
   }
 
   formatTime(date: Date): string {

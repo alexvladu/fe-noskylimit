@@ -1,20 +1,23 @@
 .profile-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem 2rem 4rem 2rem;
+  background: linear-gradient(135deg, #ff8c00, #ff416c);
   min-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .profile-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   color: white;
 
   h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: bold;
   }
 }
@@ -31,7 +34,7 @@
 
   &:hover {
     background: white;
-    color: #667eea;
+    color: #ff8c00;
   }
 }
 
@@ -46,24 +49,25 @@
 .profile-content {
   background: white;
   border-radius: 20px;
-  padding: 2rem;
+  padding: 1.5rem;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  margin-bottom: 2rem;
 }
 
 .photos-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 
   h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
     color: #333;
   }
 }
 
 .photos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.8rem;
 }
 
 .photo-item {
@@ -89,8 +93,8 @@
 
 .info-section {
   h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
     color: #333;
   }
 }
@@ -99,7 +103,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .edit-btn {
@@ -120,14 +124,14 @@
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
 
   &.full-width {
     grid-column: 1 / -1;
@@ -136,19 +140,19 @@
   label {
     font-weight: 600;
     color: #555;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
 
   span {
     color: #333;
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   input, textarea {
     padding: 0.5rem;
     border: 2px solid #ddd;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.95rem;
     transition: border-color 0.3s;
 
     &:focus {
@@ -159,20 +163,20 @@
 
   textarea {
     resize: vertical;
-    min-height: 100px;
+    min-height: 80px;
   }
 }
 
 .save-btn {
-  margin-top: 2rem;
-  padding: 1rem 2rem;
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.5rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   border-radius: 25px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: all 0.3s;
   width: 100%;
 
@@ -207,4 +211,285 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+// Tags display in view mode
+.tags-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  .tag {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+}
+
+// Edit form styles
+.edit-form {
+  .cancel-btn {
+    padding: 0.5rem 1.5rem;
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+
+    &:hover {
+      background: #cc0000;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.form-section {
+  margin-bottom: 2rem;
+
+  h3 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    font-weight: 600;
+    color: #555;
+    font-size: 0.9rem;
+  }
+
+  input, select, textarea {
+    padding: 0.6rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s;
+    font-family: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  small {
+    color: #999;
+    font-size: 0.8rem;
+  }
+}
+
+// Photo editing grid
+.photos-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.photo-edit-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  &.marked-delete {
+    opacity: 0.4;
+    filter: grayscale(100%);
+    border: 3px solid #ff4444;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .delete-photo-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 68, 68, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+
+    &:hover {
+      background: #cc0000;
+      transform: scale(1.1);
+    }
+  }
+
+  .new-badge {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 0.5rem;
+    padding: 0.2rem 0.6rem;
+    background: #4CAF50;
+    color: white;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+}
+
+.photo-upload-btn {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: 3px dashed #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+  }
+
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: #667eea;
+    font-size: 1rem;
+
+    span {
+      font-size: 3rem;
+      line-height: 1;
+    }
+
+    small {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+  }
+}
+
+// Tags selector
+.tags-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+
+  .tag-btn {
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    color: #333;
+
+    &:hover:not(:disabled) {
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    &.selected {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-color: #667eea;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    &.locked,
+    &:disabled {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-color: #667eea;
+      color: white;
+      cursor: not-allowed;
+      opacity: 0.7;
+      position: relative;
+
+      &::after {
+        content: '🔒';
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        font-size: 0.75rem;
+      }
+    }
+  }
+}
+
+// Custom scrollbar styles
+.profile-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.profile-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.profile-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  transition: background 0.3s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 1rem;
+  }
+
+  .profile-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .photos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
 }

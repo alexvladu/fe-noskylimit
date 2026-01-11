@@ -10,48 +10,30 @@
   </div>
 
   <!-- LEFT BUTTON (Pass) -->
-  <button 
-    class="swipe-btn left" 
-    (click)="swipe('left')"
-    [disabled]="cards.length === 0 || isAnimating"
-    title="Pass (← arrow key)"
-  >
+  <button class="swipe-btn left" (click)="swipe('left')" [disabled]="cards.length === 0 || isAnimating"
+    title="Pass (← arrow key)">
     ❌
   </button>
 
   <!-- RIGHT BUTTON (Like) -->
-  <button 
-    class="swipe-btn right" 
-    (click)="swipe('right')"
-    [disabled]="cards.length === 0 || isAnimating"
-    title="Like (→ arrow key)"
-  >
+  <button class="swipe-btn right" (click)="swipe('right')" [disabled]="cards.length === 0 || isAnimating"
+    title="Like (→ arrow key)">
     <img src="/heart.png" alt="Like" class="heart-icon">
   </button>
 
   <div class="card-stack">
-    <div
-      *ngFor="let card of cards; let i = index"
-      class="card"
-      [ngClass]="{
+    <div *ngFor="let card of cards; let i = index" class="card" [ngClass]="{
         'active': i === cards.length - 1,
         'swipeleft': i === cards.length - 1 && animationState === 'swipeleft',
         'swiperight': i === cards.length - 1 && animationState === 'swiperight'
-      }"
-      [style.zIndex]="i"
-      [style.transform]="
+      }" [style.zIndex]="i" [style.transform]="
         'scale(' + (1 - (cards.length - 1 - i) * 0.05) + ')' +
         ' translateY(' + ((cards.length - 1 - i) * -10) + 'px)'
-      "
-    >
+      ">
       <!-- Photo Carousel -->
       <div class="card-image-container" *ngIf="card.photos && card.photos.length > 0">
-        <img 
-          [src]="getImageUrl(card.photos[0].imageUrl)" 
-          [alt]="card.firstName + ' ' + card.lastName"
-          class="card-image"
-          (error)="onImageError($event)"
-        />
+        <img [src]="getImageUrl(card.photos[0].imageUrl)" [alt]="card.firstName + ' ' + card.lastName"
+          class="card-image" (error)="onImageError($event)" />
       </div>
 
       <div *ngIf="!card.photos || card.photos.length === 0" class="no-photo">
@@ -61,13 +43,27 @@
       <!-- Card Info -->
       <div class="card-info">
         <div class="card-header">
-          <h3>{{ card.firstName }} {{ card.lastName }}, {{ card.age }}</h3>
+          <h3 class="card-name">{{ card.firstName }} {{ card.lastName }}<span class="card-age">, {{ card.age }}</span>
+          </h3>
           <div class="card-details">
-            <span *ngIf="card.height" class="detail-item">📏 {{ card.height }} cm</span>
-            <span *ngIf="card.location" class="detail-item">📍 {{ card.location }}</span>
+            <span *ngIf="card.height" class="detail-badge">
+              <svg class="detail-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L12 22M8 6L12 2L16 6M8 18L12 22L16 18" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              {{ card.height }} cm
+            </span>
+            <span *ngIf="card.location" class="detail-badge">
+              <svg class="detail-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                  fill="currentColor" />
+              </svg>
+              {{ card.location }}
+            </span>
           </div>
         </div>
-        
+
         <div *ngIf="card.bio" class="card-bio">
           {{ card.bio }}
         </div>
@@ -75,3 +71,7 @@
     </div>
   </div>
 </div>
+
+<!-- Match Modal -->
+<app-match-modal *ngIf="showMatchModal && matchedUser" [matchedUser]="matchedUser" [currentUserPhoto]="currentUserPhoto"
+  (close)="closeMatchModal()" (sendMessage)="handleSendMessage($event)"></app-match-modal>

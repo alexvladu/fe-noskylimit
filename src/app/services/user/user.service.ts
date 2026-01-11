@@ -10,16 +10,16 @@ export interface UserDto {
     email: string;
     age?: number;
     height?: number;
-    gender?: number;
+    gender?: string; // 'Male', 'Female', 'NonBinary' from backend
     city?: string;
     bio?: string;
-    relationshipGoal?: number;
-    sexualOrientation?: number;
+    relationshipGoal?: string; // 'CasualDating', 'SeriousRelationship', 'Marriage' from backend
+    sexualOrientation?: string; // 'Straight', 'Gay', 'Lesbian', 'Bisexual', 'Other' from backend
     preferredAgeMin?: number;
     preferredAgeMax?: number;
     photos?: string[]; // Base64 encoded strings
-    languages?: number[];
-    interests?: number[];
+    languages?: string[]; // Language names from backend
+    interests?: string[]; // Interest names from backend
 }
 
 @Injectable({

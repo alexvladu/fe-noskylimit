@@ -8,7 +8,6 @@ import { RegisterComponent } from './components/register/register';
 import { SetupProfile } from './components/setup-profile/setup-profile';
 import { AuthGuard } from './guards/auth.guard';
 import { ProfileComponent } from './components/profile/profile';
-import { LikesComponent } from './components/likes/likes';
 
 export const routes: Routes = [
   {
@@ -41,14 +40,10 @@ export const routes: Routes = [
         canActivate: [AuthGuard]
       },
       {
-        path: 'likes',
-        component: LikesComponent,
-        canActivate: [AuthGuard]
-      },
-      {
         path: 'profile',
         component: ProfileComponent,
-        canActivate: [AuthGuard]
+        canActivate: [AuthGuard],
+        runGuardsAndResolvers: 'always'
       },
       {
         path: '',

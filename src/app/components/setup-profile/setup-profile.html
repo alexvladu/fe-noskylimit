@@ -13,7 +13,7 @@
         <h2>The Basics</h2>
 
         <div class="row">
-          <input type="number" placeholder="Age" [(ngModel)]="profile.age" name="age" min="18" max="70">
+          <input type="number" placeholder="Age" [(ngModel)]="profile.age" name="age" min="18" max="70" required>
           <input type="number" placeholder="Height (cm)" [(ngModel)]="profile.height" name="height" min="140" max="230">
         </div>
 
@@ -27,12 +27,19 @@
         <input type="text" placeholder="City / Location" [(ngModel)]="profile.location" name="location">
 
         <label>Languages Spoken</label>
-        <select multiple [(ngModel)]="profile.languages" name="languages" class="multi-select">
+        <div class="languages-pool">
           @for (lang of availableLanguages; track lang) {
-            <option [value]="lang">{{ lang }}</option>
+            <button
+              type="button"
+              class="language-chip"
+              [class.selected]="isLanguageSelected(lang)"
+              (click)="toggleLanguage(lang)">
+              {{ lang }}
+              @if (isLanguageSelected(lang)) { <span class="check-icon">✓</span> }
+            </button>
           }
-        </select>
-        <small>Hold Ctrl/Cmd to select multiple</small>
+        </div>
+        <small>Click to select multiple languages</small>
       </div>
     }
 
@@ -46,10 +53,12 @@
             </div>
           }
 
-          <label class="upload-btn">
-            <span>+</span>
-            <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
-          </label>
+          @if (profile.photos.length < 6) {
+            <label class="upload-btn">
+              <span>+</span>
+              <input type="file" (change)="onFileSelected($event)" accept="image/*" multiple hidden>
+            </label>
+          }
         </div>
         <p class="hint">Add at least 2 photos to get noticed. (Max 6)</p>
       </div>

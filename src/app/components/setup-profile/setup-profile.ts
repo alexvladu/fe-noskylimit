@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -26,6 +26,7 @@ export class SetupProfile implements OnInit {
 
   private router = inject(Router);
   private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
   // Data Pools (Provizoriu)
   availableHobbies: string[] = [
@@ -36,6 +37,15 @@ export class SetupProfile implements OnInit {
   ];
   availableLanguages: string[] = ['English', 'Romanian', 'Spanish', 'French', 'German'];
 
+  // Mapping between display names and backend enum values
+  private languageEnumMap: { [key: string]: number } = {
+    'English': 0,
+    'Romanian': 1,
+    'Spanish': 2,
+    'French': 3,
+    'German': 4
+  };
+
   registrationData: RegistrationData | null = null;
 
   profile = {
@@ -43,7 +53,7 @@ export class SetupProfile implements OnInit {
     gender: '',
     height: null as number | null,
     location: '',
-    languages: [] as string[],
+    languages: [] as number[], // Changed to number array for enum values
 
     photos: [] as File[],
     photoPreviews: [] as string[],
@@ -93,17 +103,87 @@ export class SetupProfile implements OnInit {
     return this.profile.hobbies.includes(hobby);
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.profile.photos.push(file);
+  // --- Logică pentru Languages (Multiple selection by clicking) ---
+  toggleLanguage(language: string) {
+    const languageEnum = this.languageEnumMap[language];
+    const index = this.profile.languages.indexOf(languageEnum);
 
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.profile.photoPreviews.push(e.target.result);
-      };
-      reader.readAsDataURL(file);
+    if (index > -1) {
+      // Language already selected, remove it
+      this.profile.languages.splice(index, 1);
+    } else {
+      // Language not selected, add it
+      this.profile.languages.push(languageEnum);
     }
+  }
+
+  isLanguageSelected(language: string): boolean {
+    const languageEnum = this.languageEnumMap[language];
+    return this.profile.languages.includes(languageEnum);
+  }
+
+  // --- Logică pentru Photos ---
+  async onFileSelected(event: any) {
+    const files: FileList = event.target.files;
+
+    if (!files || files.length === 0) {
+      return;
+    }
+
+    // Check if adding these files would exceed the maximum
+    const totalPhotos = this.profile.photos.length + files.length;
+    if (totalPhotos > 6) {
+      alert(`You can upload a maximum of 6 photos. You currently have ${this.profile.photos.length} photo(s) and tried to add ${files.length} more.`);
+      // Reset the input
+      event.target.value = '';
+      return;
+    }
+
+    // Convert FileList to array
+    const filesArray = Array.from(files);
+
+    // Add all files to photos array immediately
+    filesArray.forEach((file: File) => {
+      this.profile.photos.push(file);
+    });
+
+    // Create previews for all files using Promise.all to maintain order
+    try {
+      const previews = await Promise.all(
+        filesArray.map((file: File) => this.readFileAsDataURL(file))
+      );
+
+      // Add all previews in correct order
+      previews.forEach((preview) => {
+        this.profile.photoPreviews.push(preview);
+      });
+
+      // Manually trigger change detection to update the view
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('Error reading files:', error);
+      alert('Error loading photo previews. Please try again.');
+    }
+
+    // Reset the input so the same files can be selected again if needed
+    event.target.value = '';
+  }
+
+  // Helper method to read a file as DataURL using Promise
+  private readFileAsDataURL(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = (e: any) => {
+        resolve(e.target.result);
+      };
+
+      reader.onerror = (error) => {
+        reject(error);
+      };
+
+      reader.readAsDataURL(file);
+    });
   }
 
   removePhoto(index: number) {
@@ -128,6 +208,10 @@ export class SetupProfile implements OnInit {
       case 1:
         if (!this.profile.age || !this.profile.height || !this.profile.gender || !this.profile.location || this.profile.languages.length === 0) {
           this.error = 'Please complete all fields.';
+          return false;
+        }
+        if (this.profile.age < 18 || this.profile.age > 70) {
+          this.error = 'Age must be between 18 and 70.';
           return false;
         }
         break;
@@ -189,7 +273,7 @@ export class SetupProfile implements OnInit {
 
     // Add languages
     this.profile.languages.forEach((lang, index) => {
-      formData.append(`languages[${index}]`, this.mapLanguage(lang));
+      formData.append(`languages[${index}]`, lang.toString());
     });
 
     // Add hobbies/interests

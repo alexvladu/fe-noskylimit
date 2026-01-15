@@ -28,7 +28,17 @@ $border-color: #ddd;
   position: relative;
   overflow: hidden; // Previne scroll-ul nedorit in card
 }
-// --------------------------------------
+
+.error-message {
+  background: rgba(238, 9, 121, 0.1);
+  color: $gradient-end;
+  padding: 0.8rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+  border: 1px solid rgba(238, 9, 121, 0.2);
+}
 
 .progress-container {
   width: 100%;
@@ -140,14 +150,14 @@ small {
   font-size: 0.9rem;
 }
 
-.hobbies-pool {
+.hobbies-pool, .languages-pool {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 1.5rem;
 }
 
-.hobby-chip {
+.hobby-chip, .language-chip {
   border: 1px solid $border-color;
   background: white;
   padding: 8px 16px;
@@ -194,6 +204,31 @@ small {
   border-radius: 10px;
   background-color: #f0f0f0;
   border: 1px solid #eee;
+  position: relative;
+
+  .remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(238, 9, 121, 0.9);
+      transform: scale(1.1);
+    }
+  }
 }
 
 .upload-btn {

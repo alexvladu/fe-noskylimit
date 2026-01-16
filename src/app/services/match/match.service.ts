@@ -30,6 +30,12 @@ export interface MatchResponse {
   id: number;
   isMutual: boolean;
   message: string;
+  matchedUser?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    profilePhotoUrl?: string;
+  };
 }
 
 export interface RandomUserDto {

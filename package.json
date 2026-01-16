@@ -30,6 +30,7 @@
     "@angular/router": "^20.3.0",
     "@fortawesome/angular-fontawesome": "^3.0.0",
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
+    "@microsoft/signalr": "^10.0.0",
     "@types/js-yaml": "^4.0.9",
     "js-yaml": "^4.1.0",
     "tslib": "^2.3.0"

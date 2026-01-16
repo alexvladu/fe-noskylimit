@@ -32,8 +32,31 @@
       ">
       <!-- Photo Carousel -->
       <div class="card-image-container" *ngIf="card.photos && card.photos.length > 0">
-        <img [src]="getImageUrl(card.photos[0].imageUrl)" [alt]="card.firstName + ' ' + card.lastName"
+        <img [src]="getImageUrl(getCurrentPhoto(card))" [alt]="card.firstName + ' ' + card.lastName"
           class="card-image" (error)="onImageError($event)" />
+
+        <!-- Photo Navigation Arrows (only show if multiple photos) -->
+        <div class="photo-navigation" *ngIf="card.photos.length > 1">
+          <button class="photo-nav-btn prev" (click)="previousPhoto(); $event.stopPropagation()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button class="photo-nav-btn next" (click)="nextPhoto(); $event.stopPropagation()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Photo Indicators (only show if multiple photos) -->
+        <div class="photo-indicators" *ngIf="card.photos.length > 1">
+          <span *ngFor="let photo of card.photos; let idx = index" class="photo-indicator"
+            [class.active]="idx === (card.currentPhotoIndex || 0)" (click)="goToPhoto(idx); $event.stopPropagation()">
+          </span>
+        </div>
       </div>
 
       <div *ngIf="!card.photos || card.photos.length === 0" class="no-photo">

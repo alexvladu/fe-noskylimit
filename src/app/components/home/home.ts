@@ -1,10 +1,12 @@
-import { Component, HostListener, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, HostListener, inject, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { PingService } from '../../services/ping/ping.service';
 import { MatchService, RandomUserDto } from '../../services/match/match.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatchModalComponent } from '../match-modal/match-modal.component';
 import { UserService } from '../../services/user/user.service';
+import { NotificationService } from '../../services/notification/notification.service';
+import { Subscription } from 'rxjs';
 
 export interface Card {
   id: number;
@@ -15,6 +17,7 @@ export interface Card {
   location?: string;
   bio?: string;
   photos: Array<{ id: number; imageUrl: string }>;
+  currentPhotoIndex?: number; // Track current photo being viewed
 }
 
 @Component({
@@ -24,11 +27,12 @@ export interface Card {
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
 
   private pingService = inject(PingService);
   private matchService = inject(MatchService);
   private userService = inject(UserService);
+  private notificationService = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
 
   cards: Card[] = [];
@@ -41,6 +45,8 @@ export class HomeComponent implements OnInit {
   showMatchModal = false;
   matchedUser: { id: number; firstName: string; lastName: string; photo: string } | null = null;
   currentUserPhoto: string = '';
+
+  private matchNotificationSubscription?: Subscription;
 
   ngOnInit(): void {
     this.pingService.ping().subscribe({
@@ -61,6 +67,36 @@ export class HomeComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading current user:', err);
+      }
+    });
+
+    // Subscribe to SignalR match notifications
+    this.matchNotificationSubscription = this.notificationService.matchNotification$.subscribe({
+      next: (notification) => {
+        console.log('Received SignalR match notification:', notification);
+        if (notification.isMutual && notification.matchedUser) {
+          // Ensure current user photo is loaded
+          if (!this.currentUserPhoto) {
+            this.userService.getCurrentUser().subscribe({
+              next: (user) => {
+                if (user.photos && user.photos.length > 0) {
+                  this.currentUserPhoto = user.photos[0];
+                }
+                this.showMatchModalWithData(notification);
+              },
+              error: (err) => {
+                console.error('Error loading current user:', err);
+                // Show modal anyway even if photo fails to load
+                this.showMatchModalWithData(notification);
+              }
+            });
+          } else {
+            this.showMatchModalWithData(notification);
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Error receiving match notification:', err);
       }
     });
 
@@ -85,7 +121,8 @@ export class HomeComponent implements OnInit {
           height: user.height,
           location: user.location,
           bio: user.bio,
-          photos: user.photos || []
+          photos: user.photos || [],
+          currentPhotoIndex: 0 // Start at first photo
         };
 
         console.log('Card created:', card);
@@ -133,16 +170,14 @@ export class HomeComponent implements OnInit {
         this.matchService.createMatch(currentCard.id).subscribe({
           next: (response) => {
             console.log('Match created:', response);
-            if (response.isMutual) {
+            if (response.isMutual && response.matchedUser) {
               console.log('Mutual match!');
-              // Show match modal
+              // Show match modal with data from backend response
               this.matchedUser = {
-                id: currentCard.id,
-                firstName: currentCard.firstName,
-                lastName: currentCard.lastName,
-                photo: currentCard.photos && currentCard.photos.length > 0
-                  ? currentCard.photos[0].imageUrl
-                  : ''
+                id: response.matchedUser.id,
+                firstName: response.matchedUser.firstName,
+                lastName: response.matchedUser.lastName,
+                photo: response.matchedUser.profilePhotoUrl || ''
               };
               this.showMatchModal = true;
               this.cdr.markForCheck();
@@ -184,13 +219,88 @@ export class HomeComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
+  private showMatchModalWithData(notification: any) {
+    console.log('Showing match modal with notification:', notification);
+    console.log('Current user photo:', this.currentUserPhoto);
+    console.log('Matched user photo:', notification.matchedUser.profilePhotoUrl);
+
+    this.matchedUser = {
+      id: notification.matchedUser.id,
+      firstName: notification.matchedUser.firstName,
+      lastName: notification.matchedUser.lastName,
+      photo: notification.matchedUser.profilePhotoUrl || ''
+    };
+    this.showMatchModal = true;
+
+    // Force immediate change detection
+    this.cdr.detectChanges();
+
+    // Also mark for check to ensure Angular processes this in the next cycle
+    this.cdr.markForCheck();
+  }
+
   @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
-    if (event.key === 'ArrowLeft') {
-      this.swipe('left');
-    } else if (event.key === 'ArrowRight') {
-      this.swipe('right');
+    // If Shift is held, use arrows for photo navigation
+    if (event.shiftKey) {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        this.previousPhoto();
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        this.nextPhoto();
+      }
+    } else {
+      // Normal swipe left/right
+      if (event.key === 'ArrowLeft') {
+        this.swipe('left');
+      } else if (event.key === 'ArrowRight') {
+        this.swipe('right');
+      }
     }
+  }
+
+  // Navigate to next photo (circular)
+  nextPhoto() {
+    if (this.cards.length === 0) return;
+    const currentCard = this.cards[this.cards.length - 1];
+    if (!currentCard.photos || currentCard.photos.length <= 1) return;
+
+    const currentIndex = currentCard.currentPhotoIndex || 0;
+    // Circular navigation: go to first photo if at the end
+    currentCard.currentPhotoIndex = (currentIndex + 1) % currentCard.photos.length;
+    this.cdr.markForCheck();
+  }
+
+  // Navigate to previous photo (circular)
+  previousPhoto() {
+    if (this.cards.length === 0) return;
+    const currentCard = this.cards[this.cards.length - 1];
+    if (!currentCard.photos || currentCard.photos.length <= 1) return;
+
+    const currentIndex = currentCard.currentPhotoIndex || 0;
+    // Circular navigation: go to last photo if at the beginning
+    currentCard.currentPhotoIndex = currentIndex === 0
+      ? currentCard.photos.length - 1
+      : currentIndex - 1;
+    this.cdr.markForCheck();
+  }
+
+  // Jump to specific photo
+  goToPhoto(index: number) {
+    if (this.cards.length === 0) return;
+    const currentCard = this.cards[this.cards.length - 1];
+    if (!currentCard.photos || index < 0 || index >= currentCard.photos.length) return;
+
+    currentCard.currentPhotoIndex = index;
+    this.cdr.markForCheck();
+  }
+
+  // Get current photo for display
+  getCurrentPhoto(card: Card): string {
+    if (!card.photos || card.photos.length === 0) return '';
+    const index = card.currentPhotoIndex || 0;
+    return card.photos[index]?.imageUrl || '';
   }
 
   closeMatchModal() {
@@ -202,5 +312,12 @@ export class HomeComponent implements OnInit {
   handleSendMessage(userId: number) {
     // Modal component will handle navigation to inbox
     this.closeMatchModal();
+  }
+
+  ngOnDestroy(): void {
+    // Unsubscribe from match notifications
+    if (this.matchNotificationSubscription) {
+      this.matchNotificationSubscription.unsubscribe();
+    }
   }
 }

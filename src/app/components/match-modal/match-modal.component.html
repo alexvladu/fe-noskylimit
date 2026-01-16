@@ -10,7 +10,12 @@
         <div class="photos-container">
             <div class="photo-wrapper left">
                 <div class="photo-frame">
-                    <img [src]="getImageUrl(currentUserPhoto)" alt="You" class="match-photo">
+                    <img
+                        [src]="getImageUrl(currentUserPhoto)"
+                        alt="You"
+                        class="match-photo"
+                        (error)="onImageError($event, 'current user')"
+                        (load)="onImageLoad($event, 'current user')">
                 </div>
             </div>
 
@@ -24,8 +29,12 @@
 
             <div class="photo-wrapper right">
                 <div class="photo-frame">
-                    <img [src]="getImageUrl(matchedUser?.photo || '')" [alt]="matchedUser?.firstName"
-                        class="match-photo">
+                    <img
+                        [src]="getImageUrl(matchedUser?.photo || '')"
+                        [alt]="matchedUser?.firstName"
+                        class="match-photo"
+                        (error)="onImageError($event, 'matched user')"
+                        (load)="onImageLoad($event, 'matched user')">
                 </div>
             </div>
         </div>

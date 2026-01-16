@@ -57,6 +57,23 @@
     position: relative;
     width: 48px;
     height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff9a44, #ff4040);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 600;
+  }
+}
+
+.contacts-sidebar {
+  width: 320px;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
 
   .sidebar-header {
     padding: 20px;
@@ -277,15 +294,6 @@
   .status {
     font-size: 13px;
     color: rgba(255, 255, 255, 0.8);
-  h2 {
-    font-size: 16px;
-    margin: 0;
-    color: #fff;
-  }
-
-  .status {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.8);
   }
 }
 
@@ -350,6 +358,27 @@
       background: rgba(255, 255, 255, 0.2);
     }
   }
+
+  .send-button {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff8c00, #ff416c);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+}
 
 /* ---------------- Messages ---------------- */
 .messages-area {
@@ -477,27 +506,6 @@
   flex: 1;
   overflow-y: auto;
   padding: 12px;
-}
-
-  .send-button {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ff8c00, #ff416c);
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s;
-
-    &:hover {
-      transform: scale(1.05);
-    }
-
-    svg {
-      width: 22px;
-      height: 22px;
-    }
-  }
 }
 
 /* Scrollbars */

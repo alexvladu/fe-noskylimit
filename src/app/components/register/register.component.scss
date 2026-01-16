@@ -87,7 +87,7 @@ p {
     transition: color 0.2s ease;
 
     &:hover {
-      color: darken($gradient-end, 8%);
+      color: color.adjust($gradient-end, $lightness: -8%);
       text-decoration: underline;
     }
   }

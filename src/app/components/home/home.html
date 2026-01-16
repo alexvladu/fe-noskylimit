@@ -24,7 +24,51 @@
         ' translateY(' + ((cards.length - 1 - i) * -10) + 'px)'
       "
     >
-      <img [src]="card.img" [alt]="card.name" />
+      <div class="photo-container" *ngIf="i === cards.length - 1">
+        <img 
+          [src]="getCurrentPhoto(card)" 
+          [alt]="card.name" 
+          class="profile-photo"
+        />
+        
+        <!-- Left side click area for previous photo -->
+        <div 
+          *ngIf="hasMultiplePhotos(card)"
+          class="photo-nav-area photo-nav-left"
+          (click)="prevPhoto(card, $event)"
+        >
+          <span class="nav-arrow">‹</span>
+        </div>
+        
+        <!-- Right side click area for next photo -->
+        <div 
+          *ngIf="hasMultiplePhotos(card)"
+          class="photo-nav-area photo-nav-right"
+          (click)="nextPhoto(card, $event)"
+        >
+          <span class="nav-arrow">›</span>
+        </div>
+        
+        <!-- Photo indicator dots -->
+        <div 
+          *ngIf="hasMultiplePhotos(card)"
+          class="photo-indicators"
+        >
+          <span
+            *ngFor="let photo of getPhotos(card); let photoIndex = index"
+            class="photo-dot"
+            [class.active]="(currentPhotoIndex[card.id] || 0) === photoIndex"
+            (click)="goToPhoto(card, photoIndex, $event)"
+          ></span>
+        </div>
+      </div>
+      
+      <!-- For non-active cards, show static image -->
+      <img 
+        *ngIf="i !== cards.length - 1"
+        [src]="getCurrentPhoto(card)" 
+        [alt]="card.name" 
+      />
 
       <div class="card-info">
         <h3>{{ card.name }}</h3>
